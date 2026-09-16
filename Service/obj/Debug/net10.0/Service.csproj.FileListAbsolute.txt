@@ -1,0 +1,17 @@
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Service.deps.json
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Service.dll
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Service.pdb
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Domain.dll
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Repository.dll
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Domain.pdb
+D:\Projects\ResQ\Service\bin\Debug\net10.0\Repository.pdb
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.csproj.AssemblyReference.cache
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.AssemblyInfoInputs.cache
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.AssemblyInfo.cs
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.csproj.CoreCompileInputs.cache
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.csproj.Up2Date
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.dll
+D:\Projects\ResQ\Service\obj\Debug\net10.0\refint\Service.dll
+D:\Projects\ResQ\Service\obj\Debug\net10.0\Service.pdb
+D:\Projects\ResQ\Service\obj\Debug\net10.0\ref\Service.dll
