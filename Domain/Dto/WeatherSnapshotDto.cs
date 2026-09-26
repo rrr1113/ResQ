@@ -1,8 +1,9 @@
 using Domain.Common;
+using Domain.Models;
 
-namespace Domain.Models;
+namespace Domain.Dto;
 
-public class WeatherSnapshot : BaseEntity
+public class WeatherSnapshotDto : BaseEntity
 {
     public Guid LocationId { get; set; }
     public Location Location { get; set; } = null!;
@@ -13,6 +14,5 @@ public class WeatherSnapshot : BaseEntity
     public int WeatherCode { get; set; }
     public DateTime FetchedAt { get; set; } = DateTime.UtcNow;
 
-    // TODO dali vo service
-    public bool IsSevere => WindSpeed > 50 || Rain > 10 || WeatherCode >= 95;
+    public bool IsSevere {get; set;}
 }

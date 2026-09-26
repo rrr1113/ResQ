@@ -1,5 +1,7 @@
+using Domain.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Repository.Data;
 using Repository.Implementation;
 using Repository.Interface;
@@ -19,12 +21,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
 
 // ============================================================================================
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-//TODO
 builder.Services.AddScoped<IDeploymentService, DeploymentService>();
 builder.Services.AddScoped<IEmergencyServiceService, EmergencyServiceService>();
 builder.Services.AddScoped<IIncidentService, IncidentService>();
@@ -33,6 +33,22 @@ builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<IResponseTeamService, ResponseTeamService>();
 builder.Services.AddScoped<IStatusUpdateService, StatusUpdateService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
+
+builder.Services.AddScoped<IPriorityCalculationService, PriorityCalculationService>();
+
+builder.Services.Configure<WeatherApiSettings>(builder.Configuration.GetSection("WeatherApi"));
+builder.Services.AddScoped<IWeatherSnapshotService, WeatherSnapshotService>();
+builder.Services.AddHttpClient<IWeatherSnapshotApiClient, WeatherSnapshotApiClient>((sp, client) =>
+{
+    var settings = sp.GetRequiredService<IOptions<WeatherApiSettings>>();
+
+    client.BaseAddress = new Uri(settings.Value.BaseAddress);
+    client.Timeout = TimeSpan.FromSeconds(settings.Value.TimeoutSeconds);
+});
+// ============================================================================================
+
+
+var app = builder.Build();
 
 
 // Configure the HTTP request pipeline.

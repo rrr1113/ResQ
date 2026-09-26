@@ -10,12 +10,15 @@ public class IncidentService : IIncidentService
     private readonly IRepository<Incident> _repository;
     private readonly ILocationService _locationService;
     private readonly IOperatorService _operatorService;
+    private readonly IPriorityCalculationService _priorityCalculationService;
     
-    public IncidentService(IRepository<Incident> repository, ILocationService locationService, IOperatorService operatorService)
+    public IncidentService(IRepository<Incident> repository, ILocationService locationService, 
+        IOperatorService operatorService, IPriorityCalculationService priorityCalculationService)
     {
         _repository = repository;
         _locationService = locationService;
         _operatorService = operatorService;
+        _priorityCalculationService = priorityCalculationService;
     }
     
     public async Task<List<Incident>> GetAllAsync()
@@ -58,8 +61,6 @@ public class IncidentService : IIncidentService
             Description = description,
             NumberOfInjured = numberOfInjured,
             ReportedAt = DateTime.UtcNow,
-            //TODO -- compute the priority based on location, weather, num injured ????
-            Priority = PriorityLevel.High,
             Status = IncidentStatus.Reported,
             LocationId = locationId,
             OperatorId = _operatorService.GetUserId()
@@ -77,5 +78,14 @@ public class IncidentService : IIncidentService
     {
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
+    }
+
+    public async Task<Incident> SetIncidentPriorityLevel(Guid id)
+    {
+        Incident incident = await GetByIdNotNullAsync(id);
+        PriorityLevel priority = await _priorityCalculationService.CalculatePriorityAsync(incident);
+        
+        incident.Priority = priority;
+        return await  _repository.UpdateAsync(incident);
     }
 }
