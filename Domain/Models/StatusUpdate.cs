@@ -12,6 +12,6 @@ public class StatusUpdate : BaseAuditableEntity<Operator>
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     public string? Note { get; set; }
 
-    public Guid? UpdatedByOperatorId { get; set; }
+    public String? UpdatedByOperatorId { get; set; }
     public Operator? UpdatedByOperator { get; set; }
 }

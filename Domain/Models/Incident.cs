@@ -15,7 +15,7 @@ public class Incident : BaseAuditableEntity<Operator>
     public Guid LocationId { get; set; }
     public Location Location { get; set; } = null!;
 
-    public Guid OperatorId { get; set; }
+    public String OperatorId { get; set; }
     public Operator Operator { get; set; } = null!;
 
     public ICollection<Deployment> Deployments { get; set; } = new List<Deployment>();

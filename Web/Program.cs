@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Repository.Data;
 using Repository.Implementation;
 using Repository.Interface;
+using Service.Implementation;
+using Service.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +21,19 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// ============================================================================================
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+//TODO
+builder.Services.AddScoped<IDeploymentService, DeploymentService>();
+builder.Services.AddScoped<IEmergencyServiceService, EmergencyServiceService>();
+builder.Services.AddScoped<IIncidentService, IncidentService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IOperatorService, OperatorService>();
+builder.Services.AddScoped<IResponseTeamService, ResponseTeamService>();
+builder.Services.AddScoped<IStatusUpdateService, StatusUpdateService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

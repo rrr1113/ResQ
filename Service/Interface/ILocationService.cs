@@ -1,0 +1,16 @@
+using Domain.Models;
+
+namespace Service.Interface;
+
+public interface ILocationService
+{
+    Task<List<Location>> GetAllAsync();
+    Task<Location?> GetByIdAsync(Guid id);
+    Task<Location> GetByIdNotNullAsync(Guid id);
+
+    Task<Location> InsertAsync(String address, String city, double latitude, double longitude); 
+
+    Task<Location> UpdateAsync(Guid id, String address, String city, double latitude, double longitude); //TODO
+
+    Task<Location> DeleteByIdAsync(Guid id);
+}
