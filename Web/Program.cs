@@ -1,4 +1,6 @@
+using System.Threading.Channels;
 using Domain.Configuration;
+using Domain.Dto.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -6,7 +8,9 @@ using Repository.Data;
 using Repository.Implementation;
 using Repository.Interface;
 using Service.Implementation;
+using Service.Implementation.Excel;
 using Service.Interface;
+using Service.Interface.Excel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +59,13 @@ builder.Services.AddHttpClient<IWeatherSnapshotApiClient, WeatherSnapshotApiClie
     client.Timeout = TimeSpan.FromSeconds(settings.Value.TimeoutSeconds);
 });
 
+builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
+builder.Services.AddSingleton(Channel.CreateUnbounded<EmailMessage>());builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddHostedService<EmailBackgroundService>();
+
+builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 
 // ============================================================================================
 

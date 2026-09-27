@@ -88,4 +88,15 @@ public class IncidentService : IIncidentService
         incident.Priority = priority;
         return await  _repository.UpdateAsync(incident);
     }
+
+    public async Task<List<Incident>> GetAllByCity(string city)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x=>x,
+            predicate: x=>x.Location.City == city,
+            orderBy: x => x.OrderBy(i => i.Priority)
+        );
+
+        return result.ToList();
+    }
 }

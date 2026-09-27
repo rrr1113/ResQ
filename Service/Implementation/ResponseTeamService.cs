@@ -1,5 +1,6 @@
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Service.Interface;
 
@@ -97,5 +98,18 @@ public class ResponseTeamService : IResponseTeamService
     {
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
+    }
+
+    public async Task<List<ResponseTeam>> GetByEmergencyServiceId(Guid emergencyServiceId)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x=>x,
+            predicate: x=>x.EmergencyServiceId == emergencyServiceId,
+            include: x=>x.Include(t => t.EmergencyService),
+            orderBy: x =>x.OrderBy(t => t.NumberOfMembers
+            )
+        );
+        
+        return result.ToList();
     }
 }

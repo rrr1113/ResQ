@@ -71,4 +71,14 @@ public class EmergencyServiceService : IEmergencyServiceService
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
     }
+
+    public async Task<List<EmergencyService>> GetByName(string name)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x=>x,
+            predicate: x=>x.Name.Contains(name)
+        );
+
+        return result.ToList();
+    }
 }

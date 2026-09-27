@@ -13,4 +13,7 @@ public interface ILocationService
     Task<Location> UpdateAsync(Guid id, String address, String city, String country, double latitude, double longitude); //TODO
 
     Task<Location> DeleteByIdAsync(Guid id);
+    
+    
+    Task<List<Location>> GetByAddress(String address);
 }

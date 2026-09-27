@@ -14,4 +14,6 @@ public interface IIncidentService
     Task<Incident> UpdateAsync(Guid id); //TODO
 
     Task<Incident> DeleteByIdAsync(Guid id);
+
+    Task<List<Incident>> GetAllByCity(string city);
 }

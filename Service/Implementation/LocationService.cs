@@ -87,4 +87,14 @@ public class LocationService : ILocationService
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
     }
+
+    public async Task<List<Location>> GetByAddress(string address)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x => x,
+            predicate: x => x.Address.Contains(address)
+        );
+        
+        return result.ToList();
+    }
 }

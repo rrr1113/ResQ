@@ -14,4 +14,6 @@ public interface IEmergencyServiceService
     Task<EmergencyService> UpdateAsync(Guid id, string name, ServiceType serviceType, string contactPhone, string contactEmail); 
 
     Task<EmergencyService> DeleteByIdAsync(Guid id);
+
+    Task<List<EmergencyService>> GetByName(String name);
 }

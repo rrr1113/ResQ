@@ -14,4 +14,6 @@ public interface IResponseTeamService
     Task<ResponseTeam> UpdateAsync(Guid id, String name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId, Guid baseLocationId); //TODO
 
     Task<ResponseTeam> DeleteByIdAsync(Guid id);
+    
+    Task<List<ResponseTeam>> GetByEmergencyServiceId(Guid emergencyServiceId);
 }
