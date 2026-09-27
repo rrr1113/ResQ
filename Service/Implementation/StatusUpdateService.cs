@@ -1,5 +1,6 @@
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Service.Interface;
 
@@ -20,7 +21,8 @@ public class StatusUpdateService : IStatusUpdateService
     public async Task<List<StatusUpdate>> GetAllAsync()
     {
         var result =  await _repository.GetAllAsync(
-            selector: x => x
+            selector: x => x,
+            include: x => x.Include(s => s.Incident)
         );
         return result.ToList();
     }

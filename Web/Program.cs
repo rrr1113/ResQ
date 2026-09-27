@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using System.Threading.RateLimiting;
 using Domain.Configuration;
 using Domain.Dto.Email;
 using Microsoft.AspNetCore.Identity;
@@ -11,14 +12,22 @@ using Service.Implementation;
 using Service.Implementation.Excel;
 using Service.Interface;
 using Service.Interface.Excel;
+using Web.Interceptor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+
+builder.Services.AddScoped<AuditInterceptor>();
+
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+{
+    options.UseSqlServer(connectionString)
+        .AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
+});
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -67,6 +76,29 @@ builder.Services.AddHostedService<EmailBackgroundService>();
 
 builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 
+builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
+
+builder.Services.Configure<RateLimitSettings>(builder.Configuration.GetSection("RateLimitSettings"));
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = 429;
+
+    options.AddPolicy("external-api", context =>
+    {
+        var settings = context.RequestServices
+            .GetRequiredService<IOptions<RateLimitSettings>>().Value;
+        var apiKey = context.Request.Headers["X-Api-Key"].ToString();
+
+        return RateLimitPartition.GetFixedWindowLimiter(apiKey, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = settings.PermitLimit,
+            Window = TimeSpan.FromSeconds(settings.WindowInSeconds),
+            QueueLimit = 0,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        });
+    });
+});
 // ============================================================================================
 
 
