@@ -13,7 +13,6 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
     private readonly LocationService _locationService;
 
     public WeatherSnapshotApiClient(HttpClient httpClient,
-        IOptions<WeatherApiSettings> settings,
         LocationService locationService)
     {
         _httpClient = httpClient;
@@ -23,9 +22,14 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
     public async Task<WeatherSnapshotDto> GetWeatherForecastForLongitudeAndLatitude(Guid locationId)
     {
         Location location = await _locationService.GetByIdNotNullAsync(locationId);
+
+        if (location.Longitude == null || location.Latitude == null)
+        {
+            throw new Exception("Location not found");
+        }
         
-        double latitude = location.Latitude;
-        double longitude = location.Longitude;
+        double latitude = location.Latitude.Value;
+        double longitude = location.Longitude.Value;
         
         var url = $"v1/forecast?latitude={latitude}&longitude={longitude}" +
                   "&current=temperature_2m,precipitation,wind_speed_10m,weather_code";

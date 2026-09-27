@@ -36,6 +36,15 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 
 builder.Services.AddScoped<IPriorityCalculationService, PriorityCalculationService>();
 
+builder.Services.Configure<GeocodeApiSettings>(builder.Configuration.GetSection("GeocodeApi"));
+builder.Services.AddHttpClient<IGeocodingApiClient, GeocodingApiClient>((sp, client) =>
+{
+    var settings = sp.GetRequiredService<IOptions<GeocodeApiSettings>>();
+
+    client.BaseAddress = new Uri(settings.Value.BaseAddress);
+    client.Timeout = TimeSpan.FromSeconds(settings.Value.TimeoutSeconds);
+});
+
 builder.Services.Configure<WeatherApiSettings>(builder.Configuration.GetSection("WeatherApi"));
 builder.Services.AddScoped<IWeatherSnapshotService, WeatherSnapshotService>();
 builder.Services.AddHttpClient<IWeatherSnapshotApiClient, WeatherSnapshotApiClient>((sp, client) =>
@@ -45,6 +54,8 @@ builder.Services.AddHttpClient<IWeatherSnapshotApiClient, WeatherSnapshotApiClie
     client.BaseAddress = new Uri(settings.Value.BaseAddress);
     client.Timeout = TimeSpan.FromSeconds(settings.Value.TimeoutSeconds);
 });
+
+
 // ============================================================================================
 
 
