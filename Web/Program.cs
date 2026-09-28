@@ -46,7 +46,6 @@ builder.Services.AddScoped<IIncidentService, IncidentService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<IResponseTeamService, ResponseTeamService>();
-builder.Services.AddScoped<IStatusUpdateService, StatusUpdateService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 
 builder.Services.AddScoped<IPriorityCalculationService, PriorityCalculationService>();

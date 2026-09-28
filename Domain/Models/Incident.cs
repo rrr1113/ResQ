@@ -12,6 +12,8 @@ public class Incident : BaseAuditableEntity<Operator>
     public PriorityLevel? Priority { get; set; }
     public IncidentStatus Status { get; set; } = IncidentStatus.Reported;
     
+    public DateTime LastStatusUpdate { get; set; } = DateTime.UtcNow;
+    
     public Guid LocationId { get; set; }
     public Location Location { get; set; } = null!;
 
@@ -19,5 +21,4 @@ public class Incident : BaseAuditableEntity<Operator>
     public Operator Operator { get; set; } = null!;
 
     public ICollection<Deployment> Deployments { get; set; } = new List<Deployment>();
-    public ICollection<StatusUpdate> StatusUpdates { get; set; } = new List<StatusUpdate>();
 }

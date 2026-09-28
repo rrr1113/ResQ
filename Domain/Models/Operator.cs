@@ -8,5 +8,4 @@ public class Operator : IdentityUser
     public string Email { get; set; } = string.Empty;
 
     public ICollection<Incident> ReportedIncidents { get; set; } = new List<Incident>();
-    public ICollection<StatusUpdate> StatusUpdates { get; set; } = new List<StatusUpdate>();
 }

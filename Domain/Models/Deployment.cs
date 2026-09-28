@@ -18,10 +18,6 @@ public class Deployment : BaseEntity
     public Guid VehicleId { get; set; }
     public Vehicle Vehicle { get; set; } = null!;
     
-    // TODO dali da se stavi vo service?
-    /// <summary>Response time between dispatch and arrival on scene.</summary>
     public TimeSpan? ResponseTime => ArrivalTime.HasValue ? ArrivalTime - DispatchTime : null;
-    // TODO dali da se stavi vo service?
-    /// <summary>Total time the team spent on this deployment, dispatch to completion.</summary>
     public TimeSpan? TotalDuration => CompletionTime.HasValue ? CompletionTime - DispatchTime : null;
 }
