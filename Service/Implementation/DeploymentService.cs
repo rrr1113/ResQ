@@ -1,6 +1,8 @@
+using Domain.Dto;
 using Domain.Dto.Email;
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Service.Interface;
 
@@ -9,29 +11,32 @@ namespace Service.Implementation;
 public class DeploymentService : IDeploymentService
 {
     private readonly IRepository<Deployment> _repository;
-    private readonly IOperatorService _operatorService;
     private readonly IResponseTeamService _responseTeamService;
     private readonly IVehicleService _vehicleService;
     private readonly IEmailQueue _emailQueue;
     private readonly HelperMethods _helperMethods;
+    private readonly IIncidentService _incidentService;
     
-    public DeploymentService(IRepository<Deployment> repository, IOperatorService operatorService,
+    public DeploymentService(IRepository<Deployment> repository, 
         IResponseTeamService responseTeamService,
-        IVehicleService vehicleService, IEmailQueue emailQueue, HelperMethods helperMethods)
+        IVehicleService vehicleService, IEmailQueue emailQueue, HelperMethods helperMethods,
+        IIncidentService incidentService)
     {
         _repository = repository;
-        _operatorService = operatorService;
         _responseTeamService = responseTeamService;
         _vehicleService = vehicleService;
         _emailQueue = emailQueue;
         _helperMethods = helperMethods;
+        _incidentService = incidentService;
     }
     
-    public async Task<List<Deployment>> GetAllAsync()
+    public async Task<List<Deployment>> GetAllAsync(Guid? incidentId, Guid? teamId)
     {
         var result =  await _repository.GetAllAsync(
-            selector: x => x
-            );
+            selector: x => x,
+            predicate: x => (incidentId == null || x.IncidentId == incidentId) 
+                            && (teamId == null || x.ResponseTeamId == teamId)
+        );
         return result.ToList();
     }
 
@@ -65,7 +70,12 @@ public class DeploymentService : IDeploymentService
             Notes = notes
         };
         
-        return await _repository.InsertAsync(deployment);
+        var result = await _repository.InsertAsync(deployment);
+        
+        await _responseTeamService.UpdateStatus(responseTeamId, TeamStatus.Dispatched);
+        await _vehicleService.UpdateStatus(vehicleId, VehicleStatus.InUse);
+
+        return result;
     }
 
     public async Task<Deployment> UpdateAsync(Guid id)
@@ -79,9 +89,20 @@ public class DeploymentService : IDeploymentService
         return await _repository.DeleteAsync(result);
     }
 
-
-    public async Task<List<Deployment>> AssignTeamsForIncidentAsync(Incident incident)
+    public async Task<PaginatedResult<Deployment>> GetPagedAsync(int pageNumber, int pageSize)
     {
+        return await _repository.GetAllPagedAsync(
+            selector: x => x,
+            include: x=> x.Include(i => i.Incident),
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            asNoTracking: true);
+    }
+
+    public async Task<List<Deployment>> AssignTeamsForIncidentAsync(Guid incidentId)
+    {
+        Incident incident = await _incidentService.GetByIdNotNullAsync(incidentId);
+        
         var requiredServices = _helperMethods.RequiredServiceTypesFor(incident.Type, incident.NumberOfInjured);
         var created = new List<Deployment>();
 
@@ -106,13 +127,7 @@ public class DeploymentService : IDeploymentService
                 continue;
 
             var deployment = await InsertAsync(incident.Id, chosenTeam.Id, chosenVehicle.Id, $"Autoassigned for {serviceType.ToString()}.");
-
-            chosenTeam.Status = TeamStatus.Dispatched;
-            chosenVehicle.Status = VehicleStatus.InUse;
-
-            await _vehicleService.UpdateStatus(chosenVehicle.Id, VehicleStatus.InUse);
-            await _responseTeamService.UpdateStatus(chosenTeam.Id, TeamStatus.Dispatched);
-
+            
             created.Add(deployment);
 
             await _emailQueue.EnqueueAsync(new EmailMessage
@@ -129,7 +144,7 @@ public class DeploymentService : IDeploymentService
         {
             incident.Status = IncidentStatus.Assigned;
         } // to do dali da pravam lista za unasigned incidenti da se procesiraat so background job retry na metodovvvv
-
+        // dali autoassign posle samo kreiranje na incident ili da ima kopce za autoassign? podobro kopce?
         return created;
     }
 }

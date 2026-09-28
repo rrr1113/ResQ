@@ -13,7 +13,8 @@ public static class IncidentExtensions
             incident.Location.Address,
             incident.Location.City,
             incident.Priority?.ToString(),
-            incident.Status.ToString()
+            incident.Status.ToString(),
+            incident.Deployments.Select(d => d.ResponseTeam.ToBasicResponse()).ToList()
         );
     }
     

@@ -9,7 +9,7 @@ public interface IResponseTeamService
     Task<ResponseTeam?> GetByIdAsync(Guid id);
     Task<ResponseTeam> GetByIdNotNullAsync(Guid id);
 
-    Task<ResponseTeam> InsertAsync(String name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId, Guid baseLocationId); 
+    Task<ResponseTeam> InsertAsync(String name, int numberOfMembers, Guid emergencyServiceId, Guid baseLocationId); 
 
     Task<ResponseTeam> UpdateAsync(Guid id, String name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId, Guid baseLocationId); //TODO
 

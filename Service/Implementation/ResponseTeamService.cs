@@ -46,7 +46,7 @@ public class ResponseTeamService : IResponseTeamService
         return result;
     }
 
-    public async Task<ResponseTeam> InsertAsync(string name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId, Guid baseLocationId)
+    public async Task<ResponseTeam> InsertAsync(string name, int numberOfMembers, Guid emergencyServiceId, Guid baseLocationId)
     {
         if (await _emergencyServiceService.GetByIdAsync(emergencyServiceId) == null)
         {
@@ -62,7 +62,7 @@ public class ResponseTeamService : IResponseTeamService
         {
             Name = name,
             NumberOfMembers = numberOfMembers,
-            Status = status,
+            Status = TeamStatus.Available,
             EmergencyServiceId = emergencyServiceId,
             BaseLocationId = baseLocationId
         };

@@ -8,7 +8,8 @@ public record IncidentResponse(
     String Address,
     String City,
     String? Priority,
-    String Status
+    String Status,
+    List<ResponseTeamBasicResponse> ResponseTeams
     );
 
 public record IncidentBasicResponse(

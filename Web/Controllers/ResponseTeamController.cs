@@ -1,0 +1,50 @@
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Web.Mappers;
+using Web.Request;
+using Web.Response;
+
+namespace Web.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+[EnableRateLimiting("external-api")]
+public class ResponseTeamController : ControllerBase
+{
+    private readonly ResponseTeamMapper _responseTeamMapper;
+    
+    public ResponseTeamController(ResponseTeamMapper responseTeamMapper)
+    {
+        _responseTeamMapper = responseTeamMapper;
+    }
+    
+    [HttpGet("")]
+    public async Task<List<ResponseTeamResponse>> GetAllAsync()
+    {
+        return await _responseTeamMapper.GetAllAsync();
+    }
+    
+    [HttpPost("insert")]
+    public async Task<IActionResult> InsertTeam([FromBody] ResponseTeamRequest request)
+    {
+        var result = await _responseTeamMapper.InsertAsync(request);
+        return Ok(result);
+    }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
+    {
+        await _responseTeamMapper.DeleteAsync(id);
+        return Ok();
+    }
+    
+    [HttpPatch("{id}/updateStatus")]
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] TeamStatus status)
+    {
+        await  _responseTeamMapper.UpdateStatus(id, status);
+        return Ok();
+    }
+}

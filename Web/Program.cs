@@ -104,6 +104,9 @@ builder.Services.AddRateLimiter(options =>
 
 
 builder.Services.AddScoped<IncidentMapper>();
+builder.Services.AddScoped<DeploymentMapper>();
+builder.Services.AddScoped<ResponseTeamMapper>();
+
 
 // ============================================================================================
 
