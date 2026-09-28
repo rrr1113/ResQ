@@ -9,15 +9,18 @@ namespace Service.Implementation;
 public class DeploymentService : IDeploymentService
 {
     private readonly IRepository<Deployment> _repository;
+    private readonly IOperatorService _operatorService;
     private readonly IResponseTeamService _responseTeamService;
     private readonly IVehicleService _vehicleService;
     private readonly IEmailQueue _emailQueue;
     private readonly HelperMethods _helperMethods;
     
-    public DeploymentService(IRepository<Deployment> repository, IResponseTeamService responseTeamService,
+    public DeploymentService(IRepository<Deployment> repository, IOperatorService operatorService,
+        IResponseTeamService responseTeamService,
         IVehicleService vehicleService, IEmailQueue emailQueue, HelperMethods helperMethods)
     {
         _repository = repository;
+        _operatorService = operatorService;
         _responseTeamService = responseTeamService;
         _vehicleService = vehicleService;
         _emailQueue = emailQueue;
@@ -53,7 +56,16 @@ public class DeploymentService : IDeploymentService
 
     public async Task<Deployment> InsertAsync(Guid incidentId, Guid responseTeamId, Guid vehicleId, string? notes)
     {
-        throw new NotImplementedException();
+        var deployment = new Deployment()
+        {
+            IncidentId = incidentId,
+            ResponseTeamId = responseTeamId,
+            VehicleId = vehicleId,
+            DispatchTime = DateTime.UtcNow,
+            Notes = notes
+        };
+        
+        return await _repository.InsertAsync(deployment);
     }
 
     public async Task<Deployment> UpdateAsync(Guid id)
@@ -93,25 +105,17 @@ public class DeploymentService : IDeploymentService
             if (chosenVehicle is null)
                 continue;
 
-            var deployment = new Deployment
-            {
-                IncidentId = incident.Id,
-                ResponseTeamId = chosenTeam.Id,
-                VehicleId = chosenVehicle.Id,
-                DispatchTime = DateTime.UtcNow,
-                Notes = $"Autoassigned for {serviceType.ToString()}.",
-            };
+            var deployment = await InsertAsync(incident.Id, chosenTeam.Id, chosenVehicle.Id, $"Autoassigned for {serviceType.ToString()}.");
 
             chosenTeam.Status = TeamStatus.Dispatched;
             chosenVehicle.Status = VehicleStatus.InUse;
 
-            await _repository.InsertAsync(deployment);
             await _vehicleService.UpdateStatus(chosenVehicle.Id, VehicleStatus.InUse);
             await _responseTeamService.UpdateStatus(chosenTeam.Id, TeamStatus.Dispatched);
 
             created.Add(deployment);
 
-            await _emailQueue.EnqueueAsync(new EmailMessage()
+            await _emailQueue.EnqueueAsync(new EmailMessage
             {
                 Subject = $"[ResQ] Team dispatched - {incident.Type} at {incident.Location?.Address}",
                 To = chosenTeam.EmergencyService.ContactEmail,
@@ -124,7 +128,7 @@ public class DeploymentService : IDeploymentService
         if (created.Count > 0)
         {
             incident.Status = IncidentStatus.Assigned;
-        }
+        } // to do dali da pravam lista za unasigned incidenti da se procesiraat so background job retry na metodovvvv
 
         return created;
     }
