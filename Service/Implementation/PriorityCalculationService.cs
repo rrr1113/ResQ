@@ -42,7 +42,7 @@ public class PriorityCalculationService : IPriorityCalculationService
         }
         
         var weather = await _weatherSnapshotService.GetWeatherDataForLocationIdAsync(incident.LocationId);
-        if (weather is not null && weather.IsSevere)
+        if (weather.IsSevere)
             score += 3;
 
         return ScoreToPriority(score);
