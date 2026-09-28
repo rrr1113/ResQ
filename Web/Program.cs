@@ -15,6 +15,7 @@ using Service.Interface.Excel;
 using Web.Interceptor;
 using Web.Mappers;
 using Web.Middleware;
+using HelperMethods = Service.Implementation.HelperMethods;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +49,7 @@ builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<IResponseTeamService, ResponseTeamService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 
-builder.Services.AddScoped<IPriorityCalculationService, PriorityCalculationService>();
+builder.Services.AddScoped<HelperMethods, HelperMethods>();
 
 builder.Services.Configure<GeocodeApiSettings>(builder.Configuration.GetSection("GeocodeApi"));
 builder.Services.AddHttpClient<IGeocodingApiClient, GeocodingApiClient>((sp, client) =>

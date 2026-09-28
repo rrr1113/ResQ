@@ -16,4 +16,9 @@ public interface IResponseTeamService
     Task<ResponseTeam> DeleteByIdAsync(Guid id);
     
     Task<List<ResponseTeam>> GetByEmergencyServiceId(Guid emergencyServiceId);
+    
+    Task<List<ResponseTeam>> GetAvailableByServiceTypeAsync(ServiceType serviceType);
+    
+    Task UpdateStatus(Guid responseTeamId, TeamStatus status);
+
 }

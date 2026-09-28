@@ -82,4 +82,23 @@ public class VehicleService : IVehicleService
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
     }
+
+    public async Task<List<Vehicle>> GetAvailableForTeamAsync(Guid teamId)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x=>x,
+            predicate: x=>x.ResponseTeamId == teamId && x.Status ==  VehicleStatus.Available,
+            orderBy: x =>x.OrderBy(t => t.Capacity
+            )
+        );
+        
+        return result.ToList();
+    }
+
+    public async Task UpdateStatus(Guid vehicleId, VehicleStatus status)
+    {
+        var vehicle = await GetByIdNotNullAsync(vehicleId);
+        vehicle.Status = status;
+        await _repository.UpdateAsync(vehicle);
+    }
 }

@@ -8,6 +8,8 @@ public class Vehicle : BaseEntity
     public string PlateNumber { get; set; } = string.Empty;
     public VehicleType VehicleType { get; set; }
     public VehicleStatus Status { get; set; } = VehicleStatus.Available;
+    
+    public int Capacity { get; set; }
 
     public Guid ResponseTeamId { get; set; }
     public ResponseTeam ResponseTeam { get; set; } = null!;

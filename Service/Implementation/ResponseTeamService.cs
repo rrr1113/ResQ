@@ -112,4 +112,24 @@ public class ResponseTeamService : IResponseTeamService
         
         return result.ToList();
     }
+
+    public async Task<List<ResponseTeam>> GetAvailableByServiceTypeAsync(ServiceType serviceType)
+    {
+        var result = await _repository.GetAllAsync(
+            selector: x=>x,
+            predicate: x=>x.EmergencyService.ServiceType == serviceType,
+            include: x=>x.Include(t => t.EmergencyService),
+            orderBy: x =>x.OrderBy(t => t.NumberOfMembers
+            )
+        );
+        
+        return result.ToList();
+    }
+
+    public async Task UpdateStatus(Guid responseTeamId, TeamStatus status)
+    {
+        var team = await GetByIdNotNullAsync(responseTeamId);
+        team.Status = status;
+        await _repository.UpdateAsync(team);
+    }
 }

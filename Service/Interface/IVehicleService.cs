@@ -14,4 +14,8 @@ public interface IVehicleService
     Task<Vehicle> UpdateAsync(Guid id, String plateNumber, VehicleType vehicleType, VehicleStatus status, Guid responseTeamId); 
 
     Task<Vehicle> DeleteByIdAsync(Guid id);
+    
+    Task<List<Vehicle>> GetAvailableForTeamAsync(Guid teamId);
+    
+    Task UpdateStatus(Guid vehicleId, VehicleStatus status);
 }

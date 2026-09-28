@@ -12,15 +12,15 @@ public class IncidentService : IIncidentService
     private readonly IRepository<Incident> _repository;
     private readonly ILocationService _locationService;
     private readonly IOperatorService _operatorService;
-    private readonly IPriorityCalculationService _priorityCalculationService;
+    private readonly HelperMethods _helperMethods;
     
     public IncidentService(IRepository<Incident> repository, ILocationService locationService, 
-        IOperatorService operatorService, IPriorityCalculationService priorityCalculationService)
+        IOperatorService operatorService, HelperMethods helperMethods)
     {
         _repository = repository;
         _locationService = locationService;
         _operatorService = operatorService;
-        _priorityCalculationService = priorityCalculationService;
+        _helperMethods = helperMethods;
     }
     
     public async Task<List<Incident>> GetAllAsync(string? city, string? country)
@@ -87,7 +87,7 @@ public class IncidentService : IIncidentService
     public async Task<Incident> SetIncidentPriorityLevel(Guid id)
     {
         Incident incident = await GetByIdNotNullAsync(id);
-        PriorityLevel priority = await _priorityCalculationService.CalculatePriorityAsync(incident);
+        PriorityLevel priority = await _helperMethods.CalculatePriorityAsync(incident);
         
         incident.Priority = priority;
         return await  _repository.UpdateAsync(incident);
