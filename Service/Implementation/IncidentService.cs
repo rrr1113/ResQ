@@ -1,5 +1,7 @@
+using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Service.Interface;
 
@@ -21,10 +23,12 @@ public class IncidentService : IIncidentService
         _priorityCalculationService = priorityCalculationService;
     }
     
-    public async Task<List<Incident>> GetAllAsync()
+    public async Task<List<Incident>> GetAllAsync(string? city, string? country)
     {
         var result =  await _repository.GetAllAsync(
-            selector: x => x
+            selector: x => x,
+            predicate: x => (city == null || x.Location.City.Contains(city)) 
+                      && (country == null || x.Location.Country.Contains(country))
         );
         return result.ToList();
     }
@@ -98,5 +102,22 @@ public class IncidentService : IIncidentService
         );
 
         return result.ToList();
+    }
+
+    public async Task UpdateStatus(Guid id, IncidentStatus status)
+    {
+        var incident = await GetByIdNotNullAsync(id);
+        incident.Status = status;
+        await _repository.UpdateAsync(incident);
+    }
+    
+    public async Task<PaginatedResult<Incident>> GetPagedAsync(int pageNumber, int pageSize)
+    {
+        return await _repository.GetAllPagedAsync(
+            selector: x => x,
+            include: x=> x.Include(i => i.Location),
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            asNoTracking: true);
     }
 }

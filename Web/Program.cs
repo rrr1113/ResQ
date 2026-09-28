@@ -13,6 +13,8 @@ using Service.Implementation.Excel;
 using Service.Interface;
 using Service.Interface.Excel;
 using Web.Interceptor;
+using Web.Mappers;
+using Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +101,10 @@ builder.Services.AddRateLimiter(options =>
         });
     });
 });
+
+
+builder.Services.AddScoped<IncidentMapper>();
+
 // ============================================================================================
 
 
@@ -121,6 +127,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.UseRateLimiter();
 
 app.MapStaticAssets();
 

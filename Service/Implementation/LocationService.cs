@@ -43,7 +43,7 @@ public class LocationService : ILocationService
         return result;
     }
 
-    public async Task<Location> InsertAsync(String address, String city, String country, double latitude, double longitude)
+    public async Task<Location> InsertAsync(String address, String city, String country)
     {
         var existing = (await _repository.GetAllAsync(
             selector: l => l,

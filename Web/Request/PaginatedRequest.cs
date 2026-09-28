@@ -1,6 +1,6 @@
 namespace Web.Request;
 
-public class PaginateRequest
+public class PaginatedRequest
 {
     public const int MaxPageSize = 50;
     public int _pageSize = 10;
