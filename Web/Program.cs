@@ -63,6 +63,8 @@ builder.Services.AddHttpClient<IGeocodingApiClient, EtlGeocodingApiClient>((sp, 
 
     client.BaseAddress = new Uri(settings.Value.BaseAddress);
     client.Timeout = TimeSpan.FromSeconds(settings.Value.TimeoutSeconds);
+    
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("ResQ-EmergencyPlatform/1.0 (" + settings.Value.UserEmail +")");
 });
 
 builder.Services.Configure<WeatherApiSettings>(builder.Configuration.GetSection("WeatherApi"));

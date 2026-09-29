@@ -4,9 +4,6 @@ namespace Domain.Dto;
 
 public class GeocodingApiResponse
 {
-    [JsonPropertyName("name")]
-    public double Name  { get; set; }
-    
     [JsonPropertyName("lat")]
     public double Latitude  { get; set; }
     

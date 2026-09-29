@@ -5,8 +5,8 @@ public record LocationRequest
     String Address,
     String City,
     String Country,
-    double Latitude,
-    double Longitude
+    double? Latitude,
+    double? Longitude
 );
 
 public record LocationBasicRequest

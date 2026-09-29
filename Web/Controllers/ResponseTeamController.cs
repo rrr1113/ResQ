@@ -31,7 +31,7 @@ public class ResponseTeamController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<ResponseTeamResponse> GetAsync([FromQuery]Guid id)
+    public async Task<ResponseTeamResponse> GetAsync([FromRoute]Guid id)
     {
         return await _responseTeamMapper.GetAsync(id);
     }
@@ -58,9 +58,9 @@ public class ResponseTeamController : ControllerBase
     }
     
     [HttpPatch("{id}/updateStatus")]
-    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] TeamStatus status)
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] String status)
     {
-        await  _responseTeamMapper.UpdateStatus(id, status);
+        await  _responseTeamMapper.UpdateStatus(id, Enum.Parse<TeamStatus>(status));
         return Ok();
     }
 }

@@ -23,7 +23,9 @@ public class ResponseTeamService : IResponseTeamService
     public async Task<List<ResponseTeam>> GetAllAsync()
     {
         var result =  await _repository.GetAllAsync(
-            selector: x => x
+            selector: x => x,
+            include: x => x.Include(t => t.EmergencyService)
+                .Include(t => t.BaseLocation)
         );
         return result.ToList();
     }
@@ -32,7 +34,9 @@ public class ResponseTeamService : IResponseTeamService
     {
         return await _repository.GetAsync(
             selector: x => x,
-            predicate: x => x.Id == id);
+            predicate: x => x.Id == id,
+            include: x => x.Include(t => t.EmergencyService)
+                .Include(t => t.BaseLocation));
     }
 
     public async Task<ResponseTeam> GetByIdNotNullAsync(Guid id)

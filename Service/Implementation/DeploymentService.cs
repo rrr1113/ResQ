@@ -31,7 +31,10 @@ public class DeploymentService : IDeploymentService
         var result =  await _repository.GetAllAsync(
             selector: x => x,
             predicate: x => (incidentId == null || x.IncidentId == incidentId) 
-                            && (teamId == null || x.ResponseTeamId == teamId)
+                            && (teamId == null || x.ResponseTeamId == teamId),
+            include: x => x.Include(i => i.Incident)
+                .Include(i => i.Vehicle)
+                .Include(i => i.ResponseTeam)
         );
         return result.ToList();
     }
@@ -40,7 +43,10 @@ public class DeploymentService : IDeploymentService
     {
         return await _repository.GetAsync(
             selector: x => x,
-            predicate: x => x.Id == id);
+            predicate: x => x.Id == id,
+            include: x => x.Include(i => i.Incident)
+                .Include(i => i.Vehicle)
+                .Include(i => i.ResponseTeam));
     }
     
     public async Task<Deployment> GetByIdNotNullAsync(Guid id)

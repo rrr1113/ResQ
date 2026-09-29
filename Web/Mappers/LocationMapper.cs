@@ -39,7 +39,7 @@ public class LocationMapper
     
     public async Task<LocationResponse> UpdateAsync(Guid id, LocationRequest request)
     {
-        var result = await _locationService.UpdateAsync(id, request.Address, request.City, request.Country, request.Latitude, request.Longitude);
+        var result = await _locationService.UpdateAsync(id, request.Address, request.City, request.Country, request.Latitude.Value, request.Longitude.Value);
         return result.ToResponse();
     }
 }

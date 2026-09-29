@@ -22,7 +22,7 @@ public class EtlGeocodingApiClient : IGeocodingApiClient
     private async Task<List<GeocodingApiResponse>?> ExtractAsync(string address, string city, string country)
     {
         var query = Uri.EscapeDataString($"{address}, {city}, {country}");
-        var url = $"search?q={query}&format=json";
+        var url = $"search?q={query}&format=json&limit=1";
 
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
