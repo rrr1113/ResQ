@@ -23,26 +23,15 @@ public class EmailService : IEmailService
         email.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
         email.To.Add(MailboxAddress.Parse(message.To));
         email.Subject = message.Subject;
-
-
+        
         var builder = new BodyBuilder()
         {
             HtmlBody = message.HtmlBody,
             TextBody = message.PlainText
         };
-
-        if (message.Attachments is { Count: > 0 })
-        {
-            foreach (var attachment in message.Attachments)
-            {
-                builder.Attachments.Add(attachment.FileName, attachment.Content, MimeKit.ContentType.Parse(attachment.ContentType));
-            }
-        }
-        
         email.Body = builder.ToMessageBody();
 
         using var smtp = new SmtpClient();
-
         try
         {
             await smtp.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, 
@@ -50,11 +39,6 @@ public class EmailService : IEmailService
             
             await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
             await smtp.SendAsync(email);
-            
-        }
-        catch (Exception ex)
-        {
-            throw;
         }
         finally
         {

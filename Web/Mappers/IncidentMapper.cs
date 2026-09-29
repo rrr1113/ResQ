@@ -20,7 +20,7 @@ public class IncidentMapper
         _locationService = locationService;
     }
     
-    public async Task<List<IncidentResponse>> GetAllAsync([FromQuery] string? city, [FromQuery] string? country)
+    public async Task<List<IncidentResponse>> GetAllAsync(string? city, string? country)
     {
         var result = await _incidentService.GetAllAsync(city, country);
         return result.ToResponse();

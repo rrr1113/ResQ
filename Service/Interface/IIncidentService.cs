@@ -15,8 +15,6 @@ public interface IIncidentService
     Task<Incident> UpdateAsync(Guid id, IncidentDto incidentDto); 
 
     Task<Incident> DeleteByIdAsync(Guid id);
-
-    Task<List<Incident>> GetAllByCity(string city);
     
     Task UpdateStatus (Guid id, IncidentStatus status);
 

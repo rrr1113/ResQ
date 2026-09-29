@@ -18,9 +18,9 @@ public class ExcelExportService : IExcelExportService
         _emergencyServiceService = emergencyServiceService;
     }
     
-    public async Task<byte[]> ExportIncidentsToExcel(string city)
+    public async Task<byte[]> ExportIncidentsToExcel(string city, string country)
     {
-        var incidents = await _incidentService.GetAllByCity(city);
+        var incidents = await _incidentService.GetAllAsync(city, country);
         
         using var workbook = new XLWorkbook();
 

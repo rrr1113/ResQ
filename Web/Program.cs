@@ -51,8 +51,6 @@ builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<ITeamAssigmentService, TeamAssignmentService>();
 builder.Services.AddScoped<IPriorityCalculatorService, PriorityCalculatorService>();
 
-
-
 builder.Services.AddScoped<PriorityCalculatorService, PriorityCalculatorService>();
 
 builder.Services.Configure<GeocodeApiSettings>(builder.Configuration.GetSection("GeocodeApi"));
@@ -110,6 +108,7 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddScoped<IncidentMapper>();
 builder.Services.AddScoped<DeploymentMapper>();
 builder.Services.AddScoped<ResponseTeamMapper>();
+builder.Services.AddScoped<EmergencyServiceMapper>();
 
 
 // ============================================================================================

@@ -54,10 +54,7 @@ public class IncidentService : IIncidentService
 
     public async Task<Incident> InsertAsync(IncidentType type, string description, int numberOfInjured, Guid locationId)
     {
-        if (await _locationService.GetByIdAsync(locationId) == null)
-        {
-            throw new InvalidOperationException($"Location with id {locationId} not found");
-        }
+        await _locationService.GetByIdAsync(locationId);
         
         var incident = new Incident
         {
@@ -83,6 +80,8 @@ public class IncidentService : IIncidentService
 
     public async Task<Incident> UpdateAsync(Guid id, IncidentDto incidentDto)
     {
+        await _locationService.GetByIdAsync(incidentDto.LocationId);
+        
         var incident = await GetByIdNotNullAsync(id);
         
         incident.Type = incidentDto.Type;
@@ -100,17 +99,6 @@ public class IncidentService : IIncidentService
     {
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
-    }
-
-    public async Task<List<Incident>> GetAllByCity(string city)
-    {
-        var result = await _repository.GetAllAsync(
-            selector: x=>x,
-            predicate: x=>x.Location.City == city,
-            orderBy: x => x.OrderBy(i => i.Priority)
-        );
-
-        return result.ToList();
     }
 
     public async Task UpdateStatus(Guid id, IncidentStatus status)
