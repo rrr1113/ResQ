@@ -12,8 +12,7 @@ public class IncidentMapper
     private readonly IIncidentService _incidentService;
     private readonly ILocationService _locationService;
     private readonly IOperatorService _operatorService;
-
-
+    
     public IncidentMapper(IIncidentService incidentService, IOperatorService operatorService, ILocationService locationService)
     {
         _incidentService = incidentService;
@@ -24,16 +23,28 @@ public class IncidentMapper
     public async Task<List<IncidentResponse>> GetAllAsync([FromQuery] string? city, [FromQuery] string? country)
     {
         var result = await _incidentService.GetAllAsync(city, country);
-        
         return result.ToResponse();
     }
-
+    
+    public async Task<IncidentResponse> GetAsync(Guid deploymentId)
+    {
+        var result = await _incidentService.GetByIdNotNullAsync(deploymentId);
+        return result.ToResponse();
+    }
+    
     public async Task<IncidentBasicResponse> ReportAsync(IncidentRequest request)
     {
         var location = await _locationService.InsertAsync(request.Address, request.City, request.Country);
         
         var result = await _incidentService.InsertAsync(Enum.Parse<IncidentType>(request.Type, true), request.Description, request.NumberOfInjured, location.Id);
         return result.ToBasicResponse();
+    }
+    
+    public async Task<IncidentResponse> UpdateAsync(Guid id, IncidentUpdateRequest request)
+    {
+        var incidentDto = request.ToDto();
+        var result = await _incidentService.UpdateAsync(id, incidentDto);
+        return result.ToResponse(); 
     }
     
     public async Task UpdateStatus(Guid incidentId, IncidentStatus status)

@@ -1,3 +1,4 @@
+using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
 
@@ -11,7 +12,7 @@ public interface IVehicleService
 
     Task<Vehicle> InsertAsync(String plateNumber, VehicleType vehicleType, Guid responseTeamId); 
 
-    Task<Vehicle> UpdateAsync(Guid id, String plateNumber, VehicleType vehicleType, VehicleStatus status, Guid responseTeamId); 
+    Task<Vehicle> UpdateAsync(UpdateVehicleDto updateVehicleDto); 
 
     Task<Vehicle> DeleteByIdAsync(Guid id);
     

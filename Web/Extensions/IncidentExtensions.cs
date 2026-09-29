@@ -1,4 +1,7 @@
+using Domain.Dto;
+using Domain.Enums;
 using Domain.Models;
+using Web.Request;
 using Web.Response;
 
 namespace Web.Extensions;
@@ -31,5 +34,19 @@ public static class IncidentExtensions
             incident.Location.Address,
             incident.Location.City
         );
+    }
+    
+    public static IncidentDto ToDto(this IncidentUpdateRequest incident)
+    {
+        return new IncidentDto
+        {
+            Type = Enum.Parse<IncidentType>(incident.Type),
+            Description = incident.Description,
+            NumberOfInjured = incident.NumberOfInjured,
+            Priority = Enum.Parse<PriorityLevel>(incident.Priority),
+            Status = Enum.Parse<IncidentStatus>(incident.Status),
+            LastStatusUpdate = incident.LastStatusUpdate,
+            LocationId = incident.LocationId,
+        };
     }
 }

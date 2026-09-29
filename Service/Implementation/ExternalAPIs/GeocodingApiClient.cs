@@ -22,12 +22,16 @@ public class GeocodingApiClient : IGeocodingApiClient
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
 
-        var locationData = await response.Content.ReadFromJsonAsync<GeocodingApiResponse>();
+        var locationData = await response.Content.ReadFromJsonAsync<List<GeocodingApiResponse>>();
+        var match = locationData?.FirstOrDefault();
 
+        if (match is null)
+            throw new InvalidOperationException($"Could not resolve coordinates for '{address}, {city}, {country}'.");
+        
         return new GeocodingApiResult()
         {
-            Longitude = locationData.Longitude,
-               Latitude = locationData.Latitude
+            Longitude = match.Longitude,
+            Latitude = match.Latitude
         };
     }
 }

@@ -1,3 +1,4 @@
+using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
 
@@ -11,7 +12,7 @@ public interface IResponseTeamService
 
     Task<ResponseTeam> InsertAsync(String name, int numberOfMembers, Guid emergencyServiceId, Guid baseLocationId); 
 
-    Task<ResponseTeam> UpdateAsync(Guid id, String name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId, Guid baseLocationId); //TODO
+    Task<ResponseTeam> UpdateAsync(Guid id, ResponseTeamDto teamDto); 
 
     Task<ResponseTeam> DeleteByIdAsync(Guid id);
     

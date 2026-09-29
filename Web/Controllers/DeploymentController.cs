@@ -27,16 +27,23 @@ public class DeploymentController : ControllerBase
         return await _deploymentMapper.GetAllAsync(incidentId, teamId);
     }
     
-    [HttpGet("paged")]
-    public async Task<PaginatedResponse<DeploymentResponse>> GetAllPaged([FromQuery] PaginatedRequest request)
+    [HttpGet("{id}")]
+    public async Task<DeploymentResponse> GetAsync([FromQuery] Guid id)
     {
-        return await _deploymentMapper.GetAllPaginatedAsync(request);
+        return await _deploymentMapper.GetAsync(id);
     }
     
     [HttpPost("deploy")]
     public async Task<IActionResult> DeployAsync([FromBody] DeploymentRequest request)
     {
         var result = await _deploymentMapper.DeployAsync(request);
+        return Ok(result);
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync([FromQuery] Guid id, [FromBody] DeploymentUpdateRequest request)
+    {
+        var result = await _deploymentMapper.UpdateAsync(id, request);
         return Ok(result);
     }
     
@@ -47,10 +54,9 @@ public class DeploymentController : ControllerBase
         return Ok();
     }
     
-    [HttpGet("{incidentId}/autoDispatch")]
-    public async Task<IActionResult> AudtoDispatch([FromRoute]Guid incidentId)
+    [HttpGet("paged")]
+    public async Task<PaginatedResponse<DeploymentResponse>> GetAllPaged([FromQuery] PaginatedRequest request)
     {
-        await _deploymentMapper.AutoDispatchAsync(incidentId);
-        return Ok();
+        return await _deploymentMapper.GetAllPaginatedAsync(request);
     }
 }

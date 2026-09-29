@@ -13,21 +13,17 @@ public class DeploymentService : IDeploymentService
     private readonly IRepository<Deployment> _repository;
     private readonly IResponseTeamService _responseTeamService;
     private readonly IVehicleService _vehicleService;
-    private readonly IEmailQueue _emailQueue;
-    private readonly HelperMethods _helperMethods;
     private readonly IIncidentService _incidentService;
     
     public DeploymentService(IRepository<Deployment> repository, 
         IResponseTeamService responseTeamService,
-        IVehicleService vehicleService, IEmailQueue emailQueue, HelperMethods helperMethods,
-        IIncidentService incidentService)
+        IVehicleService vehicleService, IIncidentService incidentService)
     {
         _repository = repository;
         _responseTeamService = responseTeamService;
         _vehicleService = vehicleService;
-        _emailQueue = emailQueue;
-        _helperMethods = helperMethods;
         _incidentService = incidentService;
+
     }
     
     public async Task<List<Deployment>> GetAllAsync(Guid? incidentId, Guid? teamId)
@@ -74,13 +70,24 @@ public class DeploymentService : IDeploymentService
         
         await _responseTeamService.UpdateStatus(responseTeamId, TeamStatus.Dispatched);
         await _vehicleService.UpdateStatus(vehicleId, VehicleStatus.InUse);
-
+        await _incidentService.UpdateStatus(incidentId, IncidentStatus.Assigned);
+        
         return result;
     }
 
-    public async Task<Deployment> UpdateAsync(Guid id)
+    public async Task<Deployment> UpdateAsync(Guid id, DeploymentDto updateDeploymentDto)
     {
-        throw new NotImplementedException();
+        var deployment = await GetByIdNotNullAsync(id);
+        
+        deployment.DispatchTime = updateDeploymentDto.DispatchTime;
+        deployment.ArrivalTime = updateDeploymentDto.ArrivalTime;
+        deployment.CompletionTime = updateDeploymentDto.CompletionTime;
+        deployment.Notes =  updateDeploymentDto.Notes;
+        deployment.IncidentId = updateDeploymentDto.IncidentId;
+        deployment.ResponseTeamId = updateDeploymentDto.ResponseTeamId;
+        deployment.VehicleId = updateDeploymentDto.VehicleId;
+        
+        return await _repository.UpdateAsync(deployment);
     }
 
     public async Task<Deployment> DeleteByIdAsync(Guid id)
@@ -97,55 +104,6 @@ public class DeploymentService : IDeploymentService
             pageNumber: pageNumber,
             pageSize: pageSize,
             asNoTracking: true);
-    }
-
-    public async Task<List<Deployment>> AssignTeamsForIncidentAsync(Guid incidentId)
-    {
-        Incident incident = await _incidentService.GetByIdNotNullAsync(incidentId);
-        
-        var requiredServices = _helperMethods.RequiredServiceTypesFor(incident.Type, incident.NumberOfInjured);
-        var created = new List<Deployment>();
-
-        foreach (var serviceType in requiredServices)
-        {
-            var candidateTeams = await _responseTeamService.GetAvailableByServiceTypeAsync(serviceType);
-            if (candidateTeams.Count == 0)
-                continue;
-
-            var ranked = candidateTeams.OrderBy(t => _helperMethods.DistanceKm(
-                    incident.Location.Latitude, incident.Location.Longitude,
-                    t.BaseLocation.Latitude, t.BaseLocation.Longitude))
-                .ToList();
-
-            ResponseTeam? chosenTeam = ranked.FirstOrDefault();
-
-            var availableVehicles = await _vehicleService.GetAvailableForTeamAsync(chosenTeam.Id);
-            Vehicle? chosenVehicle = availableVehicles.FirstOrDefault();
-            ;
-
-            if (chosenVehicle is null)
-                continue;
-
-            var deployment = await InsertAsync(incident.Id, chosenTeam.Id, chosenVehicle.Id, $"Autoassigned for {serviceType.ToString()}.");
-            
-            created.Add(deployment);
-
-            await _emailQueue.EnqueueAsync(new EmailMessage
-            {
-                Subject = $"[ResQ] Team dispatched - {incident.Type} at {incident.Location?.Address}",
-                To = chosenTeam.EmergencyService.ContactEmail,
-                HtmlBody =
-                    $"Team '{chosenTeam.Name}' with vehicle '{chosenVehicle.PlateNumber}' was dispatched to incident " +
-                    $"{incident.Id} (priority {incident.Priority}) at {incident.Location?.Address} - {incident.Location?.City}."
-            });
-        }
-
-        if (created.Count > 0)
-        {
-            incident.Status = IncidentStatus.Assigned;
-        } // to do dali da pravam lista za unasigned incidenti da se procesiraat so background job retry na metodovvvv
-        // dali autoassign posle samo kreiranje na incident ili da ima kopce za autoassign? podobro kopce?
-        return created;
     }
 }
 

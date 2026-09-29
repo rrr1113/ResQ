@@ -1,3 +1,4 @@
+using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -48,15 +49,8 @@ public class ResponseTeamService : IResponseTeamService
 
     public async Task<ResponseTeam> InsertAsync(string name, int numberOfMembers, Guid emergencyServiceId, Guid baseLocationId)
     {
-        if (await _emergencyServiceService.GetByIdAsync(emergencyServiceId) == null)
-        {
-            throw new InvalidOperationException($"Emergency Service with id {emergencyServiceId} not found");
-        }
-        
-        if (await _locationService.GetByIdAsync(baseLocationId) == null)
-        {
-            throw new InvalidOperationException($"Location with id {emergencyServiceId} not found");
-        }
+        await _emergencyServiceService.GetByIdAsync(emergencyServiceId);
+        await _locationService.GetByIdAsync(baseLocationId);
         
         var responseTeam = new ResponseTeam()
         {
@@ -70,26 +64,18 @@ public class ResponseTeamService : IResponseTeamService
         return await _repository.InsertAsync(responseTeam);
     }
 
-    public async Task<ResponseTeam> UpdateAsync(Guid id, string name, int numberOfMembers, TeamStatus status, Guid emergencyServiceId,
-        Guid baseLocationId)
+    public async Task<ResponseTeam> UpdateAsync(Guid id, ResponseTeamDto teamDto)
     {
         var responseTeam = await GetByIdNotNullAsync(id);
+
+        await _emergencyServiceService.GetByIdAsync(teamDto.EmergencyServiceId);
+        await _locationService.GetByIdAsync(teamDto.BaseLocationId);
         
-        if (await _emergencyServiceService.GetByIdAsync(emergencyServiceId) == null)
-        {
-            throw new InvalidOperationException($"Emergency Service with id {emergencyServiceId} not found");
-        }
-        
-        if (await _locationService.GetByIdAsync(baseLocationId) == null)
-        {
-            throw new InvalidOperationException($"Location with id {emergencyServiceId} not found");
-        }
-        
-        responseTeam.Name = name;
-        responseTeam.NumberOfMembers = numberOfMembers;
-        responseTeam.Status = status;
-        responseTeam.EmergencyServiceId = emergencyServiceId;
-        responseTeam.BaseLocationId = baseLocationId;
+        responseTeam.Name = teamDto.Name;
+        responseTeam.NumberOfMembers = teamDto.NumberOfMembers;
+        responseTeam.Status = teamDto.Status;
+        responseTeam.EmergencyServiceId = teamDto.EmergencyServiceId;
+        responseTeam.BaseLocationId = teamDto.BaseLocationId;
         
         return await _repository.UpdateAsync(responseTeam);
     }
@@ -105,9 +91,10 @@ public class ResponseTeamService : IResponseTeamService
         var result = await _repository.GetAllAsync(
             selector: x=>x,
             predicate: x=>x.EmergencyServiceId == emergencyServiceId,
-            include: x=>x.Include(t => t.EmergencyService),
-            orderBy: x =>x.OrderBy(t => t.NumberOfMembers
-            )
+            include: x=>x.Include(t => t.EmergencyService)
+                .Include(t => t.BaseLocation)
+                .Include(t => t.Vehicles).Include(t => t.Deployments),
+            orderBy: x =>x.OrderBy(t => t.NumberOfMembers)
         );
         
         return result.ToList();
@@ -117,10 +104,8 @@ public class ResponseTeamService : IResponseTeamService
     {
         var result = await _repository.GetAllAsync(
             selector: x=>x,
-            predicate: x=>x.EmergencyService.ServiceType == serviceType,
-            include: x=>x.Include(t => t.EmergencyService),
-            orderBy: x =>x.OrderBy(t => t.NumberOfMembers
-            )
+            predicate: x=>x.EmergencyService.ServiceType == serviceType && x.Status == TeamStatus.Available,
+            include: x=>x.Include(t => t.EmergencyService).Include(t => t.BaseLocation)
         );
         
         return result.ToList();

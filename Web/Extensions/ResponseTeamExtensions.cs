@@ -1,4 +1,7 @@
+using Domain.Dto;
+using Domain.Enums;
 using Domain.Models;
+using Web.Request;
 using Web.Response;
 
 namespace Web.Extensions;
@@ -30,5 +33,17 @@ public static class ResponseTeamExtensions
             responseTeam.NumberOfMembers,
             responseTeam.Status.ToString()
         );
+    }
+    
+    public static ResponseTeamDto ToDto(this ResponseTeamRequest team)
+    {
+        return new ResponseTeamDto
+        {
+            BaseLocationId = team.BaseLocationId,
+            EmergencyServiceId = team.EmergencyServiceId,
+            Name = team.Name,
+            NumberOfMembers = team.NumberOfMembers,
+            Status = Enum.Parse<TeamStatus>(team.Status)
+        };
     }
 }

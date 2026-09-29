@@ -11,11 +11,9 @@ public interface IDeploymentService
 
     Task<Deployment> InsertAsync(Guid incidentId, Guid responseTeamId, Guid vehicleId, string? notes); 
 
-    Task<Deployment> UpdateAsync(Guid id); 
+    Task<Deployment> UpdateAsync(Guid id, DeploymentDto deploymentDto); 
 
     Task<Deployment> DeleteByIdAsync(Guid id);
     
     Task<PaginatedResult<Deployment>> GetPagedAsync(int pageNumber, int pageSize);
-
-    Task<List<Deployment>> AssignTeamsForIncidentAsync(Guid incident);
 }

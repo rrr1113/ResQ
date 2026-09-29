@@ -12,7 +12,7 @@ public interface IIncidentService
 
     Task<Incident> InsertAsync(IncidentType type, String description, int numberOfInjured, Guid locationId); 
 
-    Task<Incident> UpdateAsync(Guid id); //TODO
+    Task<Incident> UpdateAsync(Guid id, IncidentDto incidentDto); 
 
     Task<Incident> DeleteByIdAsync(Guid id);
 

@@ -1,4 +1,6 @@
+using Domain.Dto;
 using Domain.Models;
+using Web.Request;
 using Web.Response;
 
 namespace Web.Extensions;
@@ -32,5 +34,19 @@ public static class DeploymentExtensions
             deployment.ResponseTeam.Name,
             deployment.Vehicle.PlateNumber
         );
+    }
+
+    public static DeploymentDto ToDto(this DeploymentUpdateRequest deployment)
+    {
+        return new DeploymentDto
+        {
+            ArrivalTime = deployment.ArrivalTime,
+            CompletionTime = deployment.CompletionTime,
+            DispatchTime = deployment.DispatchTime,
+            Notes = deployment.Notes,
+            IncidentId = deployment.IncidentId,
+            ResponseTeamId = deployment.ResponseTeamId,
+            VehicleId = deployment.VehicleId
+        };
     }
 }

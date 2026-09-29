@@ -13,5 +13,5 @@ public class Location : BaseEntity
     
     public ICollection<Incident> Incidents { get; set; } = new List<Incident>();
     public ICollection<ResponseTeam> ResponseTeams { get; set; } = new List<ResponseTeam>();
-    public ICollection<WeatherSnapshotDto> WeatherSnapshots { get; set; } = new List<WeatherSnapshotDto>();
+    public ICollection<WeatherSnapshot> WeatherSnapshots { get; set; } = new List<WeatherSnapshot>();
 }

@@ -1,3 +1,4 @@
+using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
 using Repository.Interface;
@@ -18,9 +19,7 @@ public class VehicleService : IVehicleService
     
     public async Task<List<Vehicle>> GetAllAsync()
     {
-        var result =  await _repository.GetAllAsync(
-            selector: x => x
-        );
+        var result =  await _repository.GetAllAsync(selector: x => x);
         return result.ToList();
     }
 
@@ -45,10 +44,7 @@ public class VehicleService : IVehicleService
 
     public async Task<Vehicle> InsertAsync(string plateNumber, VehicleType vehicleType, Guid responseTeamId)
     {
-        if (await _responseTeamService.GetByIdAsync(responseTeamId) == null)
-        {
-            throw new InvalidOperationException($"ResponseTeam with id {responseTeamId} not found");
-        }
+        await _responseTeamService.GetByIdNotNullAsync(responseTeamId);
         
         var vehicle = new Vehicle()
         {
@@ -60,19 +56,15 @@ public class VehicleService : IVehicleService
         return await _repository.InsertAsync(vehicle);
     }
 
-    public async Task<Vehicle> UpdateAsync(Guid id, string plateNumber, VehicleType vehicleType, VehicleStatus status, Guid responseTeamId)
+    public async Task<Vehicle> UpdateAsync(UpdateVehicleDto updateVehicleDto)
     {
-        var vehicle = await GetByIdNotNullAsync(id);
-     
-        if (await _responseTeamService.GetByIdAsync(responseTeamId) == null)
-        {
-            throw new InvalidOperationException($"ResponseTeam with id {responseTeamId} not found");
-        }
+        var vehicle = await GetByIdNotNullAsync(updateVehicleDto.Id);
+        await _responseTeamService.GetByIdNotNullAsync(updateVehicleDto.ResponseTeamId);
         
-        vehicle.PlateNumber = plateNumber;
-        vehicle.VehicleType = vehicleType;
-        vehicle.Status = status;
-        vehicle.ResponseTeamId = responseTeamId;
+        vehicle.PlateNumber = updateVehicleDto.PlateNumber;
+        vehicle.VehicleType = updateVehicleDto.VehicleType;
+        vehicle.Status = updateVehicleDto.Status;
+        vehicle.ResponseTeamId = updateVehicleDto.ResponseTeamId;
         
         return await _repository.UpdateAsync(vehicle);
     }

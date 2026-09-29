@@ -5,5 +5,5 @@ namespace Service.Interface;
 
 public interface IWeatherSnapshotApiClient
 {
-    Task<WeatherSnapshotDto> GetWeatherForecastForLongitudeAndLatitude(Guid locationId);
+    Task<WeatherSnapshot> GetWeatherForecastForLongitudeAndLatitude(Guid locationId);
 }

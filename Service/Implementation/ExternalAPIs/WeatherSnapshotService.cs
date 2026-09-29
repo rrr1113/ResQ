@@ -22,11 +22,11 @@ public class WeatherSnapshotService : IWeatherSnapshotService
         _weatherApiSettings = weatherApiSettings.Value;
     }
     
-    public async Task<WeatherSnapshotDto> GetWeatherDataForLocationIdAsync(Guid locationId)
+    public async Task<WeatherSnapshot> GetWeatherDataForLocationIdAsync(Guid locationId)
     {
         var cacheKey = $"weather-api-for-location:{locationId}";
         
-        if (_memoryCache.TryGetValue(cacheKey, out WeatherSnapshotDto? cached))
+        if (_memoryCache.TryGetValue(cacheKey, out WeatherSnapshot? cached))
         {
             return cached;
         }

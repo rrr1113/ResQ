@@ -18,7 +18,18 @@ public class ResponseTeamMapper
     public async Task<List<ResponseTeamResponse>> GetAllAsync()
     {
         var result = await _responseTeamService.GetAllAsync();
-        
+        return result.ToResponse();
+    }
+    
+    public async Task<ResponseTeamResponse> GetAsync(Guid id)
+    {
+        var result = await _responseTeamService.GetByIdNotNullAsync(id);
+        return result.ToResponse();
+    }
+    
+    public async Task<ResponseTeamResponse> InsertAsync(ResponseTeamRequest request)
+    {
+        var result = await _responseTeamService.InsertAsync(request.Name, request.NumberOfMembers, request.EmergencyServiceId, request.BaseLocationId);
         return result.ToResponse();
     }
     
@@ -27,9 +38,10 @@ public class ResponseTeamMapper
         await _responseTeamService.DeleteByIdAsync(id);
     }
     
-    public async Task<ResponseTeamResponse> InsertAsync(ResponseTeamRequest request)
+    public async Task<ResponseTeamResponse> UpdateAsync(Guid id, ResponseTeamRequest request)
     {
-        var result = await _responseTeamService.InsertAsync(request.Name, request.NumberOfMembers, request.EmergencyServiceId, request.BaseLocationId);
+        var responseTeamDto = request.ToDto();
+        var result = await _responseTeamService.UpdateAsync(id, responseTeamDto);
         return result.ToResponse();
     }
     

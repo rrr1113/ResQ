@@ -12,15 +12,15 @@ public class IncidentService : IIncidentService
     private readonly IRepository<Incident> _repository;
     private readonly ILocationService _locationService;
     private readonly IOperatorService _operatorService;
-    private readonly HelperMethods _helperMethods;
+    private readonly PriorityCalculatorService _priorityCalculatorService;
     
     public IncidentService(IRepository<Incident> repository, ILocationService locationService, 
-        IOperatorService operatorService, HelperMethods helperMethods)
+        IOperatorService operatorService, PriorityCalculatorService priorityCalculatorService)
     {
         _repository = repository;
         _locationService = locationService;
         _operatorService = operatorService;
-        _helperMethods = helperMethods;
+        _priorityCalculatorService = priorityCalculatorService;
     }
     
     public async Task<List<Incident>> GetAllAsync(string? city, string? country)
@@ -70,27 +70,36 @@ public class IncidentService : IIncidentService
             OperatorId = _operatorService.GetUserId()
         };
         
-        return await _repository.InsertAsync(incident);
+        incident = await _repository.InsertAsync(incident);
+        
+        incident = await GetByIdNotNullAsync(incident.Id);
+
+        incident.Priority = await _priorityCalculatorService.CalculatePriorityAsync(incident);
+        await _repository.UpdateAsync(incident);
+        //await _teamAssignmentService.AssignTeamsForIncidentAsync(incident.Id);
+        
+        return incident;
     }
 
-    public async Task<Incident> UpdateAsync(Guid id)
+    public async Task<Incident> UpdateAsync(Guid id, IncidentDto incidentDto)
     {
-        throw new NotImplementedException();
+        var incident = await GetByIdNotNullAsync(id);
+        
+        incident.Type = incidentDto.Type;
+        incident.Description = incidentDto.Description;
+        incident.NumberOfInjured = incidentDto.NumberOfInjured;
+        incident.Priority = incidentDto.Priority;
+        incident.Status = incidentDto.Status;
+        incident.LastStatusUpdate = incidentDto.LastStatusUpdate;
+        incident.LocationId = incidentDto.LocationId;
+        
+        return await _repository.UpdateAsync(incident);
     }
 
     public async Task<Incident> DeleteByIdAsync(Guid id)
     {
         var result = await GetByIdNotNullAsync(id);
         return await _repository.DeleteAsync(result);
-    }
-
-    public async Task<Incident> SetIncidentPriorityLevel(Guid id)
-    {
-        Incident incident = await GetByIdNotNullAsync(id);
-        PriorityLevel priority = await _helperMethods.CalculatePriorityAsync(incident);
-        
-        incident.Priority = priority;
-        return await  _repository.UpdateAsync(incident);
     }
 
     public async Task<List<Incident>> GetAllByCity(string city)
@@ -108,6 +117,7 @@ public class IncidentService : IIncidentService
     {
         var incident = await GetByIdNotNullAsync(id);
         incident.Status = status;
+        incident.LastStatusUpdate = DateTime.UtcNow;
         await _repository.UpdateAsync(incident);
     }
     

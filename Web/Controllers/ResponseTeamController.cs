@@ -27,6 +27,12 @@ public class ResponseTeamController : ControllerBase
         return await _responseTeamMapper.GetAllAsync();
     }
     
+    [HttpGet("{id}")]
+    public async Task<ResponseTeamResponse> GetAsync([FromQuery]Guid id)
+    {
+        return await _responseTeamMapper.GetAsync(id);
+    }
+    
     [HttpPost("insert")]
     public async Task<IActionResult> InsertTeam([FromBody] ResponseTeamRequest request)
     {
@@ -38,6 +44,13 @@ public class ResponseTeamController : ControllerBase
     public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
     {
         await _responseTeamMapper.DeleteAsync(id);
+        return Ok();
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync([FromRoute]Guid id, [FromBody] ResponseTeamRequest request)
+    {
+        await  _responseTeamMapper.UpdateAsync(id, request);
         return Ok();
     }
     

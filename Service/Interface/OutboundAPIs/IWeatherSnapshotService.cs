@@ -5,5 +5,5 @@ namespace Service.Interface;
 
 public interface IWeatherSnapshotService
 {
-    Task<WeatherSnapshotDto> GetWeatherDataForLocationIdAsync(Guid eventId);
+    Task<WeatherSnapshot> GetWeatherDataForLocationIdAsync(Guid eventId);
 }

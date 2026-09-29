@@ -27,16 +27,23 @@ public class IncidentController : ControllerBase
         return await _incidentMapper.GetAllAsync(city, country);
     }
     
-    [HttpGet("paged")]
-    public async Task<PaginatedResponse<IncidentResponse>> GetAllPaged([FromQuery] PaginatedRequest request)
+    [HttpGet("{id}")]
+    public async Task<IncidentResponse> GetAsync([FromQuery] Guid id)
     {
-        return await _incidentMapper.GetAllPaginatedAsync(request);
+        return await _incidentMapper.GetAsync(id);
     }
     
     [HttpPost("report")]
     public async Task<IActionResult> ReportAsync([FromBody] IncidentRequest request)
     {
         var result = await _incidentMapper.ReportAsync(request);
+        return Ok(result);
+    }
+    
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateAsync([FromQuery] Guid id, [FromBody] IncidentUpdateRequest request)
+    {
+        var result = await _incidentMapper.UpdateAsync(id, request);
         return Ok(result);
     }
     
@@ -52,5 +59,11 @@ public class IncidentController : ControllerBase
     {
         await  _incidentMapper.UpdateStatus(id, status);
         return Ok();
+    }
+    
+    [HttpGet("paged")]
+    public async Task<PaginatedResponse<IncidentResponse>> GetAllPaged([FromQuery] PaginatedRequest request)
+    {
+        return await _incidentMapper.GetAllPaginatedAsync(request);
     }
 }

@@ -3,7 +3,7 @@ using Domain.Models;
 
 namespace Domain.Dto;
 
-public class WeatherSnapshotDto : BaseEntity
+public class WeatherSnapshot : BaseEntity
 {
     public Guid LocationId { get; set; }
     public Location Location { get; set; } = null!;

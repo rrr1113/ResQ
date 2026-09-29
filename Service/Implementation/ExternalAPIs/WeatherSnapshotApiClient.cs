@@ -19,7 +19,7 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
         _locationService = locationService;
     }
     
-    public async Task<WeatherSnapshotDto> GetWeatherForecastForLongitudeAndLatitude(Guid locationId)
+    public async Task<WeatherSnapshot> GetWeatherForecastForLongitudeAndLatitude(Guid locationId)
     {
         Location location = await _locationService.GetByIdNotNullAsync(locationId);
 
@@ -39,7 +39,7 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
 
         var weatherData = await response.Content.ReadFromJsonAsync<WeatherApiResponse>();
 
-        return new WeatherSnapshotDto()
+        return new WeatherSnapshot()
         {
             LocationId = locationId,
             Temperature = (double)weatherData.CurrentWeatherData.Temperature,
