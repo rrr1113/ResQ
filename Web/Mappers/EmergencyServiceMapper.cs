@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Domain.Enums;
 using Service.Interface;
 using Web.Extensions;
@@ -15,7 +18,7 @@ public class EmergencyServiceMapper
         _emergencyServiceService = emergencyServiceService;
     }
     
-    public async Task<List<EmergencyServiceBasicResponse>> GetAllAsync()
+    public async Task<List<EmergencyServiceResponse>> GetAllAsync()
     {
         var result = await _emergencyServiceService.GetAllAsync();
         return result.ToResponse();

@@ -10,10 +10,10 @@ namespace Service.Implementation;
 public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
 {
     private readonly HttpClient _httpClient;
-    private readonly LocationService _locationService;
+    private readonly ILocationService _locationService;
 
     public WeatherSnapshotApiClient(HttpClient httpClient,
-        LocationService locationService)
+        ILocationService locationService)
     {
         _httpClient = httpClient;
         _locationService = locationService;

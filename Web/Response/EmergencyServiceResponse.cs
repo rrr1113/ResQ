@@ -1,10 +1,12 @@
-using Domain.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Web.Response;
 
 public record EmergencyServiceResponse(
+    String Id,
     String Name,
-    ServiceType ServiceType,
+    String ServiceType,
     String ContactPhone,
     String ContactEmail,
     List<ResponseTeamBasicResponse> ResponseTeams
@@ -12,7 +14,7 @@ public record EmergencyServiceResponse(
 
 public record EmergencyServiceBasicResponse(
     String Name,
-    ServiceType ServiceType,
+    String ServiceType,
     String ContactPhone,
     String ContactEmail
     );

@@ -11,6 +11,7 @@ public static class ResponseTeamExtensions
     public static ResponseTeamResponse ToResponse(this ResponseTeam responseTeam)
     {
         return new ResponseTeamResponse(
+            responseTeam.Id.ToString(),
             responseTeam.Name,
             responseTeam.NumberOfMembers,
             responseTeam.Status.ToString(),

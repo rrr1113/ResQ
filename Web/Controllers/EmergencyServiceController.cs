@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using Web.Mappers;
 using Web.Request;
 using Web.Response;
@@ -19,18 +20,18 @@ public class EmergencyServiceController : ControllerBase
     }
     
     [HttpGet("")]
-    public async Task<List<EmergencyServiceBasicResponse>> GetAllAsync()
+    public async Task<List<EmergencyServiceResponse>> GetAllAsync()
     {
         return await _emergencyServiceMapper.GetAllAsync();
     }
     
     [HttpGet("{id}")]
-    public async Task<EmergencyServiceResponse> GetAsync([FromQuery]Guid id)
+    public async Task<EmergencyServiceResponse> GetAsync([FromRoute]Guid id)
     {
         return await _emergencyServiceMapper.GetAsync(id);
     }
     
-    [HttpPost("report")]
+    [HttpPost("add")]
     public async Task<IActionResult> ReportIncident([FromBody]EmergencyServiceRequest request)
     {
         var result = await _emergencyServiceMapper.ReportAsync(request);

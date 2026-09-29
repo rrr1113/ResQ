@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Web.Response;
 
 public record PaginatedResponse<T>

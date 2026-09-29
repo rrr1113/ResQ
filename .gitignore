@@ -12,3 +12,6 @@ obj/
 
 .DS_Store
 Thumbs.db
+
+app.db-shm
+app.db-wal

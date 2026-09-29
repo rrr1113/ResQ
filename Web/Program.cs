@@ -1,9 +1,14 @@
+using System;
 using System.Threading.Channels;
 using System.Threading.RateLimiting;
 using Domain.Configuration;
 using Domain.Dto.Email;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Repository.Data;
 using Repository.Implementation;
@@ -27,7 +32,7 @@ builder.Services.AddScoped<AuditInterceptor>();
 
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
-    options.UseSqlServer(connectionString)
+    options.UseSqlite(connectionString)
         .AddInterceptors(sp.GetRequiredService<AuditInterceptor>());
 });
 
@@ -37,6 +42,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ============================================================================================
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -54,7 +61,7 @@ builder.Services.AddScoped<IPriorityCalculatorService, PriorityCalculatorService
 builder.Services.AddScoped<PriorityCalculatorService, PriorityCalculatorService>();
 
 builder.Services.Configure<GeocodeApiSettings>(builder.Configuration.GetSection("GeocodeApi"));
-builder.Services.AddHttpClient<IGeocodingApiClient, GeocodingApiClient>((sp, client) =>
+builder.Services.AddHttpClient<IGeocodingApiClient, EtlGeocodingApiClient>((sp, client) =>
 {
     var settings = sp.GetRequiredService<IOptions<GeocodeApiSettings>>();
 
@@ -113,8 +120,13 @@ builder.Services.AddScoped<EmergencyServiceMapper>();
 
 // ============================================================================================
 
-
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 
 // Configure the HTTP request pipeline.

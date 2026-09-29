@@ -1,6 +1,9 @@
+using System;
+
 namespace Web.Response;
 
 public record ResponseTeamResponse(
+    string Id,
     string Name,
     int NumberOfMembers,
     string Status,
