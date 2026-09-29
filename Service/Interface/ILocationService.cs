@@ -8,7 +8,7 @@ public interface ILocationService
     Task<Location?> GetByIdAsync(Guid id);
     Task<Location> GetByIdNotNullAsync(Guid id);
 
-    Task<Location> InsertAsync(String address, String city, String country); 
+    Task<Location> InsertAsync(String address, String city, String country, double? latitude, double? longitude); 
 
     Task<Location> UpdateAsync(Guid id, String address, String city, String country, double latitude, double longitude); 
 

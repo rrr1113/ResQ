@@ -42,7 +42,7 @@ public class LocationService : ILocationService
         return result;
     }
 
-    public async Task<Location> InsertAsync(String address, String city, String country)
+    public async Task<Location> InsertAsync(String address, String city, String country, double? latitude, double? longitude)
     {
         var existing = (await _repository.GetAllAsync(
             selector: l => l,
@@ -54,15 +54,21 @@ public class LocationService : ILocationService
         if (existing is not null)
             return existing;
 
-        var coordinates = await _geocodingClient.GetLongitudeAndLatitudeForAddress(address, city, country);
+        if (latitude is null || longitude is null)
+        {
+            var coordinates = await _geocodingClient.GetLongitudeAndLatitudeForAddress(address, city, country);
+            latitude = coordinates?.Latitude;
+            longitude = coordinates?.Longitude;
+        }
+            
 
         var entity = new Location
         {
             Address = address,
             City = city,
             Country = country,
-            Latitude = coordinates.Latitude,
-            Longitude = coordinates.Longitude
+            Latitude = latitude,
+            Longitude = longitude
         };
         
         return await _repository.InsertAsync(entity);

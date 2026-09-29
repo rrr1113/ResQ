@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
 using Service.Interface;
 using Web.Extensions;
 using Web.Request;
@@ -37,7 +33,7 @@ public class IncidentMapper
     
     public async Task<IncidentBasicResponse> ReportAsync(IncidentRequest request)
     {
-        var location = await _locationService.InsertAsync(request.Address, request.City, request.Country);
+        var location = await _locationService.InsertAsync(request.Address, request.City, request.Country, null, null);
         
         var result = await _incidentService.InsertAsync(Enum.Parse<IncidentType>(request.Type, true), request.Description, request.NumberOfInjured, location.Id);
         return result.ToBasicResponse();

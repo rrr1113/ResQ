@@ -3,12 +3,8 @@ using System.Threading.Channels;
 using System.Threading.RateLimiting;
 using Domain.Configuration;
 using Domain.Dto.Email;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Repository.Data;
 using Repository.Implementation;
@@ -116,6 +112,8 @@ builder.Services.AddScoped<IncidentMapper>();
 builder.Services.AddScoped<DeploymentMapper>();
 builder.Services.AddScoped<ResponseTeamMapper>();
 builder.Services.AddScoped<EmergencyServiceMapper>();
+builder.Services.AddScoped<LocationMapper>();
+
 
 
 // ============================================================================================
