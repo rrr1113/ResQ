@@ -1,4 +1,5 @@
 using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Mappers;
 using Web.Request;
@@ -6,6 +7,7 @@ using Web.Response;
 
 namespace Web.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class LocationController : ControllerBase

@@ -1,4 +1,5 @@
 using Domain.Dto;
+using Domain.Enums;
 using Domain.Models;
 
 namespace Service.Interface;
@@ -16,4 +17,6 @@ public interface IDeploymentService
     Task<Deployment> DeleteByIdAsync(Guid id);
     
     Task<PaginatedResult<Deployment>> GetPagedAsync(int pageNumber, int pageSize);
+
+    Task HandleIncidentStatusChange(Guid incidentId, IncidentStatus status);
 }

@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Service;
+using Service.Interface;
+using Web.Extensions;
+using Web.Response;
 
 
 namespace Web.Controllers;
@@ -10,17 +10,17 @@ namespace Web.Controllers;
 [Route("api/[controller]")]
 public class TeamAssignmentController : ControllerBase
 {
-    private readonly TeamAssignmentService _teamAssignmentService;
+    private readonly ITeamAssigmentService _teamAssignmentService;
 
-    public TeamAssignmentController(TeamAssignmentService teamAssignmentService)
+    public TeamAssignmentController(ITeamAssigmentService teamAssignmentService)
     {
         _teamAssignmentService = teamAssignmentService;
     } 
     
     [HttpGet("{incidentId}")]
-    public async Task<IActionResult> AutomaticDeployments([FromQuery] Guid incidentId)
+    public async Task<List<DeploymentBasicResponse>> AutomaticDeployments([FromRoute] Guid incidentId)
     {
         var result = await _teamAssignmentService.AssignTeamsForIncidentAsync(incidentId);
-        return Ok(result);
+        return result.ToResponse();
     }
 }

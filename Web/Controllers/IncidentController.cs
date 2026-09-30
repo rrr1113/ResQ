@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Service.Interface;
 using Web.Mappers;
 using Web.Request;
 using Web.Response;
@@ -18,10 +17,12 @@ namespace Web.Controllers;
 public class IncidentController : ControllerBase
 {
     private readonly IncidentMapper _incidentMapper;
+    private readonly IDeploymentService _deploymentService;
     
-    public IncidentController(IncidentMapper mapper)
+    public IncidentController(IncidentMapper mapper, IDeploymentService deploymentService)
     {
         _incidentMapper = mapper;
+        _deploymentService = deploymentService;
     }
     
     [HttpGet("")]
@@ -61,6 +62,7 @@ public class IncidentController : ControllerBase
     public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] String status)
     {
         await  _incidentMapper.UpdateStatus(id, Enum.Parse<IncidentStatus>(status));
+        await _deploymentService.HandleIncidentStatusChange(id,  Enum.Parse<IncidentStatus>(status));
         return Ok();
     }
     

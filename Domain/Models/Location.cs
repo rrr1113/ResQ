@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Common;
 using Domain.Dto;
 
@@ -11,6 +12,7 @@ public class Location : BaseEntity
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
     
+    [JsonIgnore]
     public ICollection<Incident> Incidents { get; set; } = new List<Incident>();
     public ICollection<ResponseTeam> ResponseTeams { get; set; } = new List<ResponseTeam>();
     public ICollection<WeatherSnapshot> WeatherSnapshots { get; set; } = new List<WeatherSnapshot>();

@@ -12,6 +12,7 @@ public class IncidentService : IIncidentService
     private readonly IRepository<Incident> _repository;
     private readonly ILocationService _locationService;
     private readonly IOperatorService _operatorService;
+
     private readonly PriorityCalculatorService _priorityCalculatorService;
     
     public IncidentService(IRepository<Incident> repository, ILocationService locationService, 
@@ -29,7 +30,11 @@ public class IncidentService : IIncidentService
             selector: x => x,
             predicate: x => (city == null || x.Location.City.Contains(city)) 
                       && (country == null || x.Location.Country.Contains(country)),
-            include: x=> x.Include(i => i.Location).ThenInclude(l => l.WeatherSnapshots)
+            include: x => x
+                .Include(i => i.Location)
+                .ThenInclude(l => l.WeatherSnapshots)
+                .Include(i => i.Deployments)
+                .ThenInclude(d => d.ResponseTeam)
         );
         return result.ToList();
     }
@@ -107,6 +112,7 @@ public class IncidentService : IIncidentService
         var incident = await GetByIdNotNullAsync(id);
         incident.Status = status;
         incident.LastStatusUpdate = DateTime.UtcNow;
+        
         await _repository.UpdateAsync(incident);
     }
     

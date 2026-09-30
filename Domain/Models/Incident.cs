@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Common;
 using Domain.Dto;
 using Domain.Enums;
@@ -21,5 +22,6 @@ public class Incident : BaseAuditableEntity<Operator>
     public String OperatorId { get; set; }
     public Operator Operator { get; set; } = null!;
 
+    [JsonIgnore]
     public ICollection<Deployment> Deployments { get; set; } = new List<Deployment>();
 }

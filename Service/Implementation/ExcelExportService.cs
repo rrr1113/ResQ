@@ -28,7 +28,7 @@ public class ExcelExportService : IExcelExportService
         
         var headers = new[]
         {
-            "Incident ID", "Operator", "Type",
+            "Incident ID", "Type",
             "ReportedAt", "Description", "NumberOfInjured", 
             "Address", "Number Assigned Teams", "Assigned Teams"
         };
@@ -49,14 +49,13 @@ public class ExcelExportService : IExcelExportService
         foreach (var incident in incidents)
         {
             ws.Cell(row, 1).Value = incident.Id.ToString();
-            ws.Cell(row, 2).Value = $"{incident.Operator.FullName}";
-            ws.Cell(row, 3).Value = incident.Type.ToString();
-            ws.Cell(row, 4).Value = incident.ReportedAt;
-            ws.Cell(row, 5).Value = incident.Description;
-            ws.Cell(row, 6).Value = incident.NumberOfInjured;
-            ws.Cell(row, 7).Value = incident.Location.Address;
-            ws.Cell(row, 8).Value = incident.Deployments.Count.ToString();
-            ws.Cell(row, 9).Value = string.Join(", ",
+            ws.Cell(row, 2).Value = incident.Type.ToString();
+            ws.Cell(row, 3).Value = incident.ReportedAt;
+            ws.Cell(row, 4).Value = incident.Description;
+            ws.Cell(row, 5).Value = incident.NumberOfInjured;
+            ws.Cell(row, 6).Value = incident.Location.Address;
+            ws.Cell(row, 7).Value = incident.Deployments.Count.ToString();
+            ws.Cell(row, 8).Value = string.Join(", ",
                 incident.Deployments
                     .Select(d => d.ResponseTeam.Name)
                     .Distinct());
@@ -107,9 +106,12 @@ public class ExcelExportService : IExcelExportService
 
         foreach (var team in responseTeams)
         {
-            double avgResponseTime = team.Deployments
+            var responseTimes = team.Deployments
                 .Where(d => d.ArrivalTime.HasValue && d.CompletionTime.HasValue)
-                .Average(d => (d.CompletionTime!.Value - d.ArrivalTime!.Value).TotalMinutes);
+                .Select(d => (d.CompletionTime!.Value - d.ArrivalTime!.Value).TotalMinutes)
+                .ToList();
+
+            double avgResponseTime = responseTimes.Any()? responseTimes.Average() : 0;
             
             ws.Cell(row, 1).Value = team.Id.ToString();
             ws.Cell(row, 2).Value = $"{team.Name}";
@@ -117,7 +119,7 @@ public class ExcelExportService : IExcelExportService
             ws.Cell(row, 4).Value = team.BaseLocation.Address + " - " + team.BaseLocation.City;
             ws.Cell(row, 5).Value = team.Deployments.Count.ToString();
             ws.Cell(row, 6).Value = avgResponseTime;
-            ws.Cell(row, 6).Value = string.Join(", ",
+            ws.Cell(row, 7).Value = string.Join(", ",
                 team.Vehicles
                     .Select(v => v.PlateNumber + "-" + v.VehicleType)
                     .Distinct());;

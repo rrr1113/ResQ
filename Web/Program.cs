@@ -79,7 +79,6 @@ builder.Services.AddHttpClient<IWeatherSnapshotApiClient, WeatherSnapshotApiClie
 
 builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
 builder.Services.AddSingleton(Channel.CreateUnbounded<EmailMessage>());builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddHostedService<EmailBackgroundService>();
 
@@ -115,7 +114,7 @@ builder.Services.AddScoped<DeploymentMapper>();
 builder.Services.AddScoped<ResponseTeamMapper>();
 builder.Services.AddScoped<EmergencyServiceMapper>();
 builder.Services.AddScoped<LocationMapper>();
-
+builder.Services.AddScoped<VehicleMapper>();
 
 
 // ============================================================================================

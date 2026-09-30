@@ -35,7 +35,7 @@ public class DeploymentService : IDeploymentService
             selector: x => x,
             predicate: x => (incidentId == null || x.IncidentId == incidentId) 
                             && (teamId == null || x.ResponseTeamId == teamId),
-            include: x => x.Include(i => i.Incident)
+            include: x => x.Include(i => i.Incident).ThenInclude(l => l.Location)
                 .Include(i => i.Vehicle)
                 .Include(i => i.ResponseTeam)
         );
@@ -126,6 +126,24 @@ public class DeploymentService : IDeploymentService
             pageNumber: pageNumber,
             pageSize: pageSize,
             asNoTracking: true);
+    }
+    
+    public async Task HandleIncidentStatusChange(Guid incidentId, IncidentStatus status)
+    {
+        var deployments = await GetAllAsync(incidentId, null);
+
+        foreach (var deployment in deployments)
+        {
+            if (status == IncidentStatus.Resolved || status == IncidentStatus.Cancelled)
+            {
+                await _responseTeamService.UpdateStatus(deployment.ResponseTeamId, TeamStatus.Available);
+                await _vehicleService.UpdateStatus(deployment.VehicleId, VehicleStatus.Available);
+            }
+            else if (status == IncidentStatus.OnTheWay || status == IncidentStatus.OnScene)
+            {
+                await _responseTeamService.UpdateStatus(deployment.ResponseTeamId, TeamStatus.Busy);
+            }
+        }
     }
 }
 

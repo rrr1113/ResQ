@@ -1,6 +1,7 @@
 using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository.Interface;
 using Service.Interface;
 
@@ -19,7 +20,7 @@ public class VehicleService : IVehicleService
     
     public async Task<List<Vehicle>> GetAllAsync()
     {
-        var result =  await _repository.GetAllAsync(selector: x => x);
+        var result =  await _repository.GetAllAsync(selector: x => x, include: x => x.Include(v => v.ResponseTeam));
         return result.ToList();
     }
 
@@ -27,7 +28,8 @@ public class VehicleService : IVehicleService
     {
         return await _repository.GetAsync(
             selector: x => x,
-            predicate: x => x.Id == id);
+            predicate: x => x.Id == id,
+            include: x => x.Include(v => v.ResponseTeam));
     }
 
     public async Task<Vehicle> GetByIdNotNullAsync(Guid id)

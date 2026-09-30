@@ -32,17 +32,29 @@ public class EmailService : IEmailService
         email.Body = builder.ToMessageBody();
 
         using var smtp = new SmtpClient();
+        
         try
         {
-            await smtp.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, 
-                _settings.UseSsl ? MailKit.Security.SecureSocketOptions.StartTls : MailKit.Security.SecureSocketOptions.Auto, ct);
+            smtp.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+            {
+                return true;
+            };
             
-            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+            await smtp.ConnectAsync(
+                _settings.SmtpHost,
+                _settings.SmtpPort,
+                MailKit.Security.SecureSocketOptions.StartTls,
+                ct);
+            
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password, ct);
             await smtp.SendAsync(email);
         }
         finally
         {
-            smtp.DisconnectAsync(true, ct);
+            if (smtp.IsConnected)
+            {
+                await smtp.DisconnectAsync(true, ct);
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interface.Excel;
 
 namespace Web.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class ExportController : ControllerBase
 {
@@ -18,7 +18,7 @@ public class ExportController : ControllerBase
     } 
     
     [HttpGet("{country}-{city}/incidents.xlsx")]
-    public async Task<IActionResult> ExportIncidents([FromQuery] String city, [FromQuery] String country)
+    public async Task<IActionResult> ExportIncidents([FromRoute] String city, [FromRoute] String country)
     {
         var bytes = await _excelExportService.ExportIncidentsToExcel(city, country);
         return File(bytes, XlsxContentType, $"incidents_{city}.xlsx");

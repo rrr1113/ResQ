@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Domain.Common;
 using Domain.Models;
 
@@ -6,6 +7,7 @@ namespace Domain.Dto;
 public class WeatherSnapshot : BaseEntity
 {
     public Guid LocationId { get; set; }
+    [JsonIgnore]
     public Location Location { get; set; } = null!;
 
     public double Temperature { get; set; } 
