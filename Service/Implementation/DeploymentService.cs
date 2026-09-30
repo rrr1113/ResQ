@@ -14,15 +14,18 @@ public class DeploymentService : IDeploymentService
     private readonly IResponseTeamService _responseTeamService;
     private readonly IVehicleService _vehicleService;
     private readonly IIncidentService _incidentService;
+    private readonly IEmailQueue _emailQueue;
     
     public DeploymentService(IRepository<Deployment> repository, 
         IResponseTeamService responseTeamService,
-        IVehicleService vehicleService, IIncidentService incidentService)
+        IVehicleService vehicleService, IIncidentService incidentService,
+        IEmailQueue emailQueue)
     {
         _repository = repository;
         _responseTeamService = responseTeamService;
         _vehicleService = vehicleService;
         _incidentService = incidentService;
+        _emailQueue = emailQueue;
 
     }
     
@@ -63,6 +66,10 @@ public class DeploymentService : IDeploymentService
 
     public async Task<Deployment> InsertAsync(Guid incidentId, Guid responseTeamId, Guid vehicleId, string? notes)
     {
+        var incident = await _incidentService.GetByIdNotNullAsync(incidentId);
+        var team = await _responseTeamService.GetByIdNotNullAsync(responseTeamId);
+        var vehicle = await _vehicleService.GetByIdNotNullAsync(vehicleId);
+
         var deployment = new Deployment()
         {
             IncidentId = incidentId,
@@ -77,6 +84,15 @@ public class DeploymentService : IDeploymentService
         await _responseTeamService.UpdateStatus(responseTeamId, TeamStatus.Dispatched);
         await _vehicleService.UpdateStatus(vehicleId, VehicleStatus.InUse);
         await _incidentService.UpdateStatus(incidentId, IncidentStatus.Assigned);
+        
+        await _emailQueue.EnqueueAsync(new EmailMessage
+        {
+            To = team.EmergencyService.ContactEmail,
+            Subject = $"[ResQ] Team dispatched - {incident.Type} at {incident.Location?.Address}",
+            HtmlBody =
+                $"Team '{team.Name}' with vehicle '{vehicle.PlateNumber}' was dispatched to incident " +
+                $"{incident.Id} (priority {incident.Priority}) at {incident.Location?.Address} - {incident.Location?.City}."
+        });
         
         return result;
     }

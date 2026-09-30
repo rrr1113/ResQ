@@ -13,10 +13,10 @@ public class EtlGeocodingApiClient : IGeocodingApiClient
         _httpClient = httpClient;
     }
     
-    public async Task<GeocodingApiResult> GetLongitudeAndLatitudeForAddress(string address, string city, string country)
+    public async Task<GeocodingApiResult?> GetLongitudeAndLatitudeForAddress(string address, string city, string country)
     {
         var raw = await ExtractAsync(address, city, country);
-        return Transform(raw, address, city, country);
+        return Transform(raw);
     }
 
     private async Task<List<GeocodingApiResponse>?> ExtractAsync(string address, string city, string country)
@@ -30,13 +30,13 @@ public class EtlGeocodingApiClient : IGeocodingApiClient
         return await response.Content.ReadFromJsonAsync<List<GeocodingApiResponse>>();
     }
 
-    private static GeocodingApiResult Transform(List<GeocodingApiResponse>? raw, string address, string city, string country)
+    private static GeocodingApiResult? Transform(List<GeocodingApiResponse>? raw)
     {
         var match = raw?.FirstOrDefault();
 
         if (match is null)
-            throw new InvalidOperationException($"Could not resolve coordinates for '{address}, {city}, {country}'.");
-
+            return null;
+        
         return new GeocodingApiResult
         {
             Latitude = match.Latitude,

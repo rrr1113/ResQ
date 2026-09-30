@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Domain.Dto;
 using Domain.Enums;
 using Domain.Models;
@@ -14,12 +11,17 @@ public static class IncidentExtensions
     public static IncidentResponse ToResponse(this Incident incident)
     {
         return new IncidentResponse(
-            incident.Type,
+            incident.Id,
+            incident.Type.ToString(),
             incident.ReportedAt,
             incident.Location.Address,
             incident.Location.City,
+            incident.Location.Country,
             incident.Priority?.ToString(),
             incident.Status.ToString(),
+            incident.Location.WeatherSnapshots.OrderByDescending(x => x.FetchedAt).Select(w => w.Temperature).FirstOrDefault(),
+            incident.Location.WeatherSnapshots.OrderByDescending(x => x.FetchedAt).Select(w => w.Rain).FirstOrDefault(),
+            incident.Location.WeatherSnapshots.OrderByDescending(x => x.FetchedAt).Select(w => w.WeatherCode).FirstOrDefault(),
             incident.Deployments.Select(d => d.ResponseTeam.ToBasicResponse()).ToList()
         );
     }
@@ -47,9 +49,7 @@ public static class IncidentExtensions
             Description = incident.Description,
             NumberOfInjured = incident.NumberOfInjured,
             Priority = Enum.Parse<PriorityLevel>(incident.Priority),
-            Status = Enum.Parse<IncidentStatus>(incident.Status),
-            LastStatusUpdate = incident.LastStatusUpdate,
-            LocationId = incident.LocationId,
+            Status = Enum.Parse<IncidentStatus>(incident.Status)
         };
     }
 }

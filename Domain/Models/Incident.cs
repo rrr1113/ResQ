@@ -1,4 +1,5 @@
 using Domain.Common;
+using Domain.Dto;
 using Domain.Enums;
 
 namespace Domain.Models;

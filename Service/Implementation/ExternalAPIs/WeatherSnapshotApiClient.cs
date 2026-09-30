@@ -1,8 +1,7 @@
+using System.Globalization;
 using System.Net.Http.Json;
-using Domain.Configuration;
 using Domain.Dto;
 using Domain.Models;
-using Microsoft.Extensions.Options;
 using Service.Interface;
 
 namespace Service.Implementation;
@@ -19,17 +18,18 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
         _locationService = locationService;
     }
     
-    public async Task<WeatherSnapshot> GetWeatherForecastForLongitudeAndLatitude(Guid locationId)
+    public async Task<WeatherSnapshot?> GetWeatherForecastForLongitudeAndLatitude(Guid locationId)
     {
         Location location = await _locationService.GetByIdNotNullAsync(locationId);
-
+        
         if (location.Longitude == null || location.Latitude == null)
         {
-            throw new Exception("Location not found");
+            Console.WriteLine("NO COORDINATES - WEATHER API NOT CALLED");
+            return null;
         }
         
-        double latitude = location.Latitude.Value;
-        double longitude = location.Longitude.Value;
+        String latitude = location.Latitude.Value.ToString(CultureInfo.InvariantCulture);
+        String longitude = location.Longitude.Value.ToString(CultureInfo.InvariantCulture);
         
         var url = $"v1/forecast?latitude={latitude}&longitude={longitude}" +
                   "&current=temperature_2m,precipitation,wind_speed_10m,weather_code";
@@ -38,10 +38,14 @@ public class WeatherSnapshotApiClient : IWeatherSnapshotApiClient
         response.EnsureSuccessStatusCode();
 
         var weatherData = await response.Content.ReadFromJsonAsync<WeatherApiResponse>();
-
+        if (weatherData == null || weatherData.CurrentWeatherData == null)
+        {
+            return null;
+        }
         return new WeatherSnapshot()
         {
             LocationId = locationId,
+            Location = location,
             Temperature = (double)weatherData.CurrentWeatherData.Temperature,
             WindSpeed = (double)weatherData.CurrentWeatherData.WindSpeed,
             Rain = (double)weatherData.CurrentWeatherData.Precipitation,

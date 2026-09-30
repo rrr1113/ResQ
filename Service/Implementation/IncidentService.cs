@@ -28,7 +28,8 @@ public class IncidentService : IIncidentService
         var result =  await _repository.GetAllAsync(
             selector: x => x,
             predicate: x => (city == null || x.Location.City.Contains(city)) 
-                      && (country == null || x.Location.Country.Contains(country))
+                      && (country == null || x.Location.Country.Contains(country)),
+            include: x=> x.Include(i => i.Location).ThenInclude(l => l.WeatherSnapshots)
         );
         return result.ToList();
     }
@@ -37,7 +38,9 @@ public class IncidentService : IIncidentService
     {
         return await _repository.GetAsync(
             selector: x => x,
-            predicate: x => x.Id == id);
+            predicate: x => x.Id == id,
+            include: x=> x.Include(i => i.Location).ThenInclude(l => l.WeatherSnapshots)
+            );
     }
 
     public async Task<Incident> GetByIdNotNullAsync(Guid id)
@@ -89,8 +92,6 @@ public class IncidentService : IIncidentService
         incident.NumberOfInjured = incidentDto.NumberOfInjured;
         incident.Priority = incidentDto.Priority;
         incident.Status = incidentDto.Status;
-        incident.LastStatusUpdate = incidentDto.LastStatusUpdate;
-        incident.LocationId = incidentDto.LocationId;
         
         return await _repository.UpdateAsync(incident);
     }

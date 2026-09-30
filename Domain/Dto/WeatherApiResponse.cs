@@ -8,7 +8,7 @@ public class WeatherApiResponse
     public WeatherCurrent CurrentWeatherData { get; set; }
     
     [JsonPropertyName("elevation")]
-    public WeatherCurrent Elevation { get; set; }
+    public decimal Elevation { get; set; }
    
 }
 

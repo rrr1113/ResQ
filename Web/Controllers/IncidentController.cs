@@ -31,7 +31,7 @@ public class IncidentController : ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<IncidentResponse> GetAsync([FromQuery] Guid id)
+    public async Task<IncidentResponse> GetAsync([FromRoute] Guid id)
     {
         return await _incidentMapper.GetAsync(id);
     }
@@ -44,7 +44,7 @@ public class IncidentController : ControllerBase
     }
     
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAsync([FromQuery] Guid id, [FromBody] IncidentUpdateRequest request)
+    public async Task<IActionResult> UpdateAsync([FromRoute] Guid id, [FromBody] IncidentUpdateRequest request)
     {
         var result = await _incidentMapper.UpdateAsync(id, request);
         return Ok(result);
@@ -58,9 +58,9 @@ public class IncidentController : ControllerBase
     }
     
     [HttpPatch("{id}/updateStatus")]
-    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] IncidentStatus status)
+    public async Task<IActionResult> UpdateStatus([FromRoute]Guid id, [FromBody] String status)
     {
-        await  _incidentMapper.UpdateStatus(id, status);
+        await  _incidentMapper.UpdateStatus(id, Enum.Parse<IncidentStatus>(status));
         return Ok();
     }
     

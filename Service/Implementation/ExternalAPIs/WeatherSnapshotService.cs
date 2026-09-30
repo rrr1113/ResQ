@@ -1,8 +1,8 @@
 using Domain.Configuration;
 using Domain.Dto;
-using Domain.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Repository.Interface;
 using Service.Interface;
 
 namespace Service.Implementation;
@@ -12,17 +12,20 @@ public class WeatherSnapshotService : IWeatherSnapshotService
     private readonly IMemoryCache _memoryCache;
     private readonly IWeatherSnapshotApiClient _weatherApiClient;
     private readonly WeatherApiSettings _weatherApiSettings;
+    private readonly IRepository<WeatherSnapshot> _repository;
 
     public WeatherSnapshotService(IMemoryCache memoryCache, 
         IWeatherSnapshotApiClient weatherApiClient,
-        IOptions<WeatherApiSettings> weatherApiSettings)
+        IOptions<WeatherApiSettings> weatherApiSettings,
+        IRepository<WeatherSnapshot> repository)
     {
         _memoryCache = memoryCache;
         _weatherApiClient = weatherApiClient;
         _weatherApiSettings = weatherApiSettings.Value;
+        _repository = repository;
     }
     
-    public async Task<WeatherSnapshot> GetWeatherDataForLocationIdAsync(Guid locationId)
+    public async Task<WeatherSnapshot?> GetWeatherDataForLocationIdAsync(Guid locationId)
     {
         var cacheKey = $"weather-api-for-location:{locationId}";
         
@@ -30,15 +33,14 @@ public class WeatherSnapshotService : IWeatherSnapshotService
         {
             return cached;
         }
-        
-        if (cached != null)
+
+        var apiData = await _weatherApiClient.GetWeatherForecastForLongitudeAndLatitude(locationId);
+
+        if (apiData != null)
         {
-            return cached;
+            await _repository.InsertAsync(apiData);
         }
-
-        var apiData = 
-            await _weatherApiClient.GetWeatherForecastForLongitudeAndLatitude(locationId);
-
+        
         _memoryCache.Set(cacheKey, apiData, TimeSpan.FromMinutes(_weatherApiSettings.CacheExpirationMinutes));
         
         return apiData;

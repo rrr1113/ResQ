@@ -44,24 +44,31 @@ public class LocationService : ILocationService
 
     public async Task<Location> InsertAsync(String address, String city, String country, double? latitude, double? longitude)
     {
-        var existing = (await _repository.GetAllAsync(
-            selector: l => l,
-            predicate: l =>
-                l.Address.ToLower() == address.ToLower() && 
-                l.City.ToLower() == city.ToLower() && 
-                l.Country.ToLower() == country.ToLower())).FirstOrDefault();
+        address = address.Trim();
+        city = city.Trim();
+        country = country.Trim();
+        Console.WriteLine($"ADDRESS: [{address}]");
+        Console.WriteLine($"CITY: [{city}]");
+        Console.WriteLine($"COUNTRY: [{country}]");
+        var existing = await _repository.GetAsync(
+                selector: l => l,
+                predicate: l =>
+                    l.Address == address &&
+                    l.City == city &&
+                    l.Country == country
+            );
 
         if (existing is not null)
             return existing;
 
+        Console.WriteLine("NO EXISTING LOCATION FOUND - INSERTING");
         if (latitude is null || longitude is null)
         {
             var coordinates = await _geocodingClient.GetLongitudeAndLatitudeForAddress(address, city, country);
             latitude = coordinates?.Latitude;
             longitude = coordinates?.Longitude;
         }
-            
-
+        
         var entity = new Location
         {
             Address = address,

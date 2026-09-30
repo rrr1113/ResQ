@@ -1,16 +1,17 @@
-using System;
-using System.Collections.Generic;
-using Domain.Enums;
-
 namespace Web.Response;
 
 public record IncidentResponse(
-    IncidentType Type, 
+    Guid Id,
+    String Type, 
     DateTime ReportedAt,
     String Address,
     String City,
+    String Country,
     String? Priority,
     String Status,
+    double Temperature,
+    double Rain,
+    int WeatherCode,
     List<ResponseTeamBasicResponse> ResponseTeams
     );
 

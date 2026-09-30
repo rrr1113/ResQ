@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.Data;
 
 #nullable disable
 
-namespace Web.Data.Migrations
+namespace Repository.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260930185316_AddIncidentWeather")]
+    partial class AddIncidentWeather
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
@@ -24,6 +27,9 @@ namespace Web.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FetchedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("IncidentId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsSevere")
@@ -45,6 +51,8 @@ namespace Web.Data.Migrations
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IncidentId");
 
                     b.HasIndex("LocationId");
 
@@ -198,9 +206,6 @@ namespace Web.Data.Migrations
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Address", "City", "Country")
-                        .IsUnique();
 
                     b.ToTable("Locations");
                 });
@@ -483,6 +488,10 @@ namespace Web.Data.Migrations
 
             modelBuilder.Entity("Domain.Dto.WeatherSnapshot", b =>
                 {
+                    b.HasOne("Domain.Models.Incident", null)
+                        .WithMany("WeatherSnapshots")
+                        .HasForeignKey("IncidentId");
+
                     b.HasOne("Domain.Models.Location", "Location")
                         .WithMany("WeatherSnapshots")
                         .HasForeignKey("LocationId")
@@ -627,6 +636,8 @@ namespace Web.Data.Migrations
             modelBuilder.Entity("Domain.Models.Incident", b =>
                 {
                     b.Navigation("Deployments");
+
+                    b.Navigation("WeatherSnapshots");
                 });
 
             modelBuilder.Entity("Domain.Models.Location", b =>

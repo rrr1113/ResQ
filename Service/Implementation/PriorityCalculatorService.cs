@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Drawing;
 using Domain.Enums;
 using Domain.Models;
 using Service.Interface;
@@ -27,10 +28,19 @@ public class PriorityCalculatorService : IPriorityCalculatorService
         {
             score += 3;
         }
-        
+
         var weather = await _weatherSnapshotService.GetWeatherDataForLocationIdAsync(incident.LocationId);
-        if (weather.IsSevere)
-            score += 3;
+        if (weather != null)
+        {
+            Console.WriteLine($"Temperature: {weather.Temperature}");
+            Console.WriteLine($"Wind: {weather.WindSpeed}");
+            Console.WriteLine($"Rain: {weather.Rain}");
+            Console.WriteLine($"Weather code: {weather.WeatherCode}");
+            Console.WriteLine($"Location: {weather.Location.Id}");
+
+            if (weather.IsSevere)
+                score += 3;
+        }
 
         return ScoreToPriority(score);
     }

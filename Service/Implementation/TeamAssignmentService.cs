@@ -1,4 +1,3 @@
-using Domain.Dto.Email;
 using Domain.Enums;
 using Domain.Models;
 using Service.Interface;
@@ -10,18 +9,15 @@ public class TeamAssignmentService : ITeamAssigmentService
     private readonly IDeploymentService _deploymentService;
     private readonly IResponseTeamService _responseTeamService;
     private readonly IVehicleService _vehicleService;
-    private readonly IEmailQueue _emailQueue;
     private readonly IIncidentService _incidentService;
     
     public TeamAssignmentService(IDeploymentService deploymentService,
      IResponseTeamService responseTeamService, IVehicleService vehicleService, 
-     IEmailQueue emailQueue, 
      IIncidentService incidentService)
     {
         _deploymentService = deploymentService;
         _responseTeamService = responseTeamService;
         _vehicleService = vehicleService;
-        _emailQueue = emailQueue;
         _incidentService = incidentService;
     }
     
@@ -64,15 +60,6 @@ public class TeamAssignmentService : ITeamAssigmentService
                 $"Autoassigned for {serviceType.ToString()}.");
             
             createdDeployments.Add(deployment);
-
-            await _emailQueue.EnqueueAsync(new EmailMessage
-            {
-                To = chosenTeam.EmergencyService.ContactEmail,
-                Subject = $"[ResQ] Team dispatched - {incident.Type} at {incident.Location?.Address}",
-                HtmlBody =
-                    $"Team '{chosenTeam.Name}' with vehicle '{chosenVehicle.PlateNumber}' was dispatched to incident " +
-                    $"{incident.Id} (priority {incident.Priority}) at {incident.Location?.Address} - {incident.Location?.City}."
-            });
         }
         
         return createdDeployments;
