@@ -79,7 +79,7 @@ public class ExcelExportService : IExcelExportService
     public async Task<byte[]> ExportResponseTeamToExcel(Guid emergencyServiceId)
     {
         var responseTeams = await _responseTeamService.GetByEmergencyServiceId(emergencyServiceId);
-        var emergencyService = await _emergencyServiceService.GetByIdAsync(emergencyServiceId);
+        var emergencyService = await _emergencyServiceService.GetByIdNotNullAsync(emergencyServiceId);
         
         using var workbook = new XLWorkbook();
 

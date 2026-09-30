@@ -138,10 +138,19 @@ public class DeploymentService : IDeploymentService
             {
                 await _responseTeamService.UpdateStatus(deployment.ResponseTeamId, TeamStatus.Available);
                 await _vehicleService.UpdateStatus(deployment.VehicleId, VehicleStatus.Available);
+                
+                deployment.CompletionTime = DateTime.UtcNow;
+                await _repository.UpdateAsync(deployment);
             }
             else if (status == IncidentStatus.OnTheWay || status == IncidentStatus.OnScene)
             {
                 await _responseTeamService.UpdateStatus(deployment.ResponseTeamId, TeamStatus.Busy);
+            }
+
+            if (status == IncidentStatus.OnScene)
+            {
+                deployment.ArrivalTime = DateTime.UtcNow;
+                await _repository.UpdateAsync(deployment);
             }
         }
     }
